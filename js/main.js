@@ -1,72 +1,44 @@
-(function() {
-  var map;
+$(function() {
+  var map = L.map('map').setView([41.66471, 2.10938], 8)
 
-  function initialize() {
-    var mapEl = document.getElementById('map-canvas'),
-        mapOptions = {
-          zoom: 8,
-          center: new google.maps.LatLng(41.66471, 2.10938),
-          mapTypeId: google.maps.MapTypeId.ROADMAP,
-          styles:[{"stylers": [{"saturation": -75},{"lightness": 50}]}]
-        };
-    map = new google.maps.Map(mapEl,
-        mapOptions);
+  L.tileLayer('http://{s}.tile.cloudmade.com/9346c049ef8342d9916bdc1a0d64d73f/998/256/{z}/{x}/{y}.png', {
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+      maxZoom: 18
+  }).addTo(map);
 
-    // Load the station data. When the data comes back, create an overlay.
-    d3.json("data.json", function(data) {
-      var overlay = new google.maps.OverlayView();
+  // Initialize the SVG layer
+  map._initPathRoot();
 
-      // Add the container when the overlay is added to the map.
-      overlay.onAdd = function() {
-        var overlayProjection = this.getProjection(),
-            layer = d3.select(this.getPanes().overlayLayer)
-                      .append("div")
-                      .attr("class", "circles");
-            // svg = layer.append("svg")
-            //               .attr("width", mapEl.offsetWidth)
-            //               .attr("height", mapEl.offsetHeight)
+  var svg = d3.select(map.getPanes().overlayPane).select("svg"),
+      g = svg.append("g");
 
-        // Draw each marker as a separate SVG element
-        overlay.draw = function() {
+  d3.json("data.json", function(collection) {
+    collection = collection.values;
+    // Add a LatLng object to each item in the dataset
+    collection.forEach(function(d) {
+      d.LatLng = new L.LatLng(d.lat,d.lng);
+    });
 
-          function transform(d) {
-            d = new google.maps.LatLng(d.lat, d.lng);
-            d = overlayProjection.fromLatLngToDivPixel(d);
-            return d3.select(this)
-                .style("left", d.x + "px")
-                .style("top", d.y + "px");
-          }
-
-          var circleContainers = layer.selectAll("svg")
-            .data(data.values)
-            .each(transform) // update existing
-          .enter()
-            .append("svg")
-            .each(transform)
-            .attr("class", "circle-container");
-
-          // Add circles
-          circleContainers.append("circle")
-            .attr("cx", 50)
-            .attr("cy", 50)
-            .attr("r", function (d) {
+    var feature = svg.selectAll("circle")
+      .data(collection)
+    .enter()
+      .append("circle")
+      .style("fill", function(d) {
+        var d = d.value;
+        var returnColor;
+        if (d > 0.2) returnColor = "red";
+        else if (d > 0.1) returnColor = "orange";
+        else returnColor = "yellow";
+        return returnColor;
+      })
+      .attr("r", function (d) {
               return d.value * 30;
             })
-            .style("fill", function(d) {
-              var d = d.value;
-              var returnColor;
-              if (d > 0.2) returnColor = "red";
-              else if (d > 0.1) returnColor = "orange";
-              else returnColor = "yellow";
-              return returnColor;
-            });
-        };
-      };
-
-      // Bind our overlay to the map…
-      overlay.setMap(map);
-    });
-  }
-
-  google.maps.event.addDomListener(window, 'load', initialize);
-})();
+      .attr("cx", function(d) {
+        return map.latLngToLayerPoint(d.LatLng).x;
+      })
+      .attr("cy", function(d) {
+        return map.latLngToLayerPoint(d.LatLng).y;
+      });
+  });
+});

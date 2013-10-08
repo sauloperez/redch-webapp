@@ -97,30 +97,23 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
-html, body, #map-canvas {
+html, body, #map {
     margin: 0;
     padding: 0;
     height: 100%;
 }
 
-.circles svg {
+#map svg {
+    position: relative;
+    height: 100%,
+    width: 1280px;
+}
+
+#map g {
     position: absolute;
+    width: 100%;
+    height: 100%;
 }
-
-.circle {
-    fill: orange;
-}
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* ==========================================================================
