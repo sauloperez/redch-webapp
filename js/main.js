@@ -10,16 +10,30 @@ $(function() {
   map._initPathRoot();
 
   var svg = d3.select(map.getPanes().overlayPane).select("svg"),
-      g = svg.append("g");
+      g = svg.append("g").attr("class", "leaflet-zoom-hide");
 
   d3.json("data.json", function(collection) {
     collection = collection.values;
+    var bounds = d3.geo.bounds(collection);
+
+    var project = function(p) {
+      return map.latLngToLayerPoint(p);
+    };
+
+    // Scale the overlaying SVG shapes
+    var resetOverlay = function() {
+      g.selectAll("circle")
+        .attr("cx", function(d) { return project(d.LatLng).x; })
+        .attr("cy", function(d) { return project(d.LatLng).y; });
+    };
+
+
     // Add a LatLng object to each item in the dataset
     collection.forEach(function(d) {
       d.LatLng = new L.LatLng(d.lat,d.lng);
     });
 
-    var feature = svg.selectAll("circle")
+    var feature = g.selectAll("circle")
       .data(collection)
     .enter()
       .append("circle")
@@ -34,11 +48,10 @@ $(function() {
       .attr("r", function (d) {
               return d.value * 30;
             })
-      .attr("cx", function(d) {
-        return map.latLngToLayerPoint(d.LatLng).x;
-      })
-      .attr("cy", function(d) {
-        return map.latLngToLayerPoint(d.LatLng).y;
-      });
+      .attr("cx", function(d) { return project(d.LatLng).x; })
+      .attr("cy", function(d) { return project(d.LatLng).y; });
+
+    map.on("viewreset", resetOverlay);
   });
+
 });
