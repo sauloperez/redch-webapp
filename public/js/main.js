@@ -1,5 +1,9 @@
 $(function() {
-  var map = L.map('map').setView([41.66471, 2.10938], 8)
+  'use strict';
+
+  window.Redch = {};
+
+  var map = Redch.map = L.map('map').setView([41.66471, 2.10938], 8)
 
   L.tileLayer('http://{s}.tile.cloudmade.com/9346c049ef8342d9916bdc1a0d64d73f/998/256/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
@@ -52,4 +56,18 @@ $(function() {
     map.on("viewreset", resetOverlay);
   });
 
+
+  // WEBSOCKETS
+  Redch.WS = {};
+
+  var connection = Redch.WS.connection = new WebSocket('ws://0.0.0.0:8080', ['soap', 'xmpp']);
+
+  // Log errors
+  connection.onerror = function(error) {
+    console.log('WebSocket Error: ' + error);
+  };
+
+  connection.onmessage = function(e) {
+    console.log(e.data);
+  }
 });
