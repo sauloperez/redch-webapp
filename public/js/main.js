@@ -60,8 +60,9 @@ $(function() {
   // WEBSOCKETS
   Redch.WS = {};
 
-  Redch.WS.scheme = "ws://",
-  Redch.WS.uri = Redch.WS.scheme + window.document.location.host + "/";
+  Redch.WS.scheme = "ws://";
+  Redch.WS.port = 8080;
+  Redch.WS.uri = Redch.WS.scheme + window.document.location.hostname + ":" + Redch.WS.port;
 
   var ws = Redch.WS.connection = new WebSocket(Redch.WS.uri);
 
