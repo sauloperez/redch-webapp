@@ -1,4 +1,4 @@
-require 'sinatra'
+require 'sinatra/base'
 require 'em-websocket'
 require 'pp'
 
