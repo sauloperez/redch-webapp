@@ -3,7 +3,7 @@ $(function() {
 
   L.tileLayer('http://{s}.tile.cloudmade.com/9346c049ef8342d9916bdc1a0d64d73f/998/256/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-      maxZoom: 18
+      minZoom: 8
   }).addTo(map);
 
   // Initialize the SVG layer
@@ -45,9 +45,7 @@ $(function() {
         else returnColor = "yellow";
         return returnColor;
       })
-      .attr("r", function (d) {
-              return d.value * 30;
-            })
+      .attr("r", function (d) { return d.value * 20; })
       .attr("cx", function(d) { return project(d.LatLng).x; })
       .attr("cy", function(d) { return project(d.LatLng).y; });
 
