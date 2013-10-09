@@ -1,4 +1,6 @@
 source "https://rubygems.org"
 
+gem "faye-websocket"
 gem "sinatra"
-gem "em-websocket"
+gem "puma"
+gem "json"

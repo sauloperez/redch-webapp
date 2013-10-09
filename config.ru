@@ -1,2 +1,8 @@
+#\ -s puma -E production
+
 require './app'
-run Sinatra::Application
+require './middlewares/websocket'
+
+use Redch::Websocket
+
+run Redch::App

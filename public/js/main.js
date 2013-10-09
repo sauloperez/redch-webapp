@@ -60,14 +60,23 @@ $(function() {
   // WEBSOCKETS
   Redch.WS = {};
 
-  var connection = Redch.WS.connection = new WebSocket('ws://0.0.0.0:8080', ['soap', 'xmpp']);
+  Redch.WS.scheme = "ws://",
+  Redch.WS.uri = Redch.WS.scheme + window.document.location.host + "/";
+
+  var ws = Redch.WS.connection = new WebSocket(Redch.WS.uri);
 
   // Log errors
-  connection.onerror = function(error) {
+  ws.onerror = function(error) {
     console.log('WebSocket Error: ' + error);
   };
 
-  connection.onmessage = function(e) {
+  ws.onmessage = function(e) {
+    // var data = JSON.parse(e.data);
     console.log(e.data);
-  }
+  };
+
+  ws.onopen = function(e) {
+    console.log('WebSocket connection open to ' + Redch.WS.uri);
+    ws.send('hello');
+  };
 });
