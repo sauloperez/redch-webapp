@@ -20,7 +20,7 @@ $(function() {
       return map.latLngToLayerPoint(p);
     };
 
-    // Scale the overlaying SVG shapes
+    // Relocate the overlaying SVG shapes
     var resetOverlay = function() {
       g.selectAll("circle")
         .attr("cx", function(d) { return project(d.LatLng).x; })
