@@ -6,11 +6,11 @@ $channel = EM::Channel.new
 
 EM.run {
 
-  class App < Sinatra::Base
+  app = Sinatra.new {
     get '/' do
       erb :index
     end
-  end
+  }
 
   EM::WebSocket.run(:host => "0.0.0.0", :port => 8080) do |ws|
     ws.onopen { |handshake|
@@ -33,5 +33,5 @@ EM.run {
     }
   end
 
-  App.run!
+  app.run!
 }
