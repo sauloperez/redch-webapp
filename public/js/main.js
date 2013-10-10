@@ -2,6 +2,7 @@ $(function() {
   'use strict';
 
   window.Redch = {};
+  Redch.collection = [];
 
   var map = Redch.map = L.map('map').setView([41.66471, 2.10938], 8)
 
@@ -16,30 +17,27 @@ $(function() {
   var svg = d3.select(map.getPanes().overlayPane).select("svg"),
       g = svg.append("g").attr("class", "leaflet-zoom-hide");
 
-  d3.json("data.json", function(collection) {
-    collection = collection.values;
-    var bounds = d3.geo.bounds(collection);
+  var project = function(p) {
+    return map.latLngToLayerPoint(p);
+  };
 
-    var project = function(p) {
-      return map.latLngToLayerPoint(p);
-    };
+  // Relocate the overlaying SVG shapes
+  var resetOverlay = function() {
+    g.selectAll("circle")
+      .attr("cx", function(d) { return project(d.LatLng).x; })
+      .attr("cy", function(d) { return project(d.LatLng).y; });
+  };
 
-    // Relocate the overlaying SVG shapes
-    var resetOverlay = function() {
-      g.selectAll("circle")
-        .attr("cx", function(d) { return project(d.LatLng).x; })
-        .attr("cy", function(d) { return project(d.LatLng).y; });
-    };
-
-
+  Redch.draw = function(collection) {
     // Add a LatLng object to each item in the dataset
     collection.forEach(function(d) {
-      d.LatLng = new L.LatLng(d.lat,d.lng);
+      d.LatLng = new L.LatLng(d.lat, d.lng);
     });
 
     var feature = g.selectAll("circle")
-      .data(collection)
-    .enter()
+      .data(collection);
+
+    feature.enter()
       .append("circle")
       .style("fill", function(d) {
         var d = d.value;
@@ -49,12 +47,18 @@ $(function() {
         else returnColor = "yellow";
         return returnColor;
       })
-      .attr("r", function (d) { return d.value * 20; })
+      // .attr("r", function (d) { return d.value * 20; })
       .attr("cx", function(d) { return project(d.LatLng).x; })
-      .attr("cy", function(d) { return project(d.LatLng).y; });
+      .attr("cy", function(d) { return project(d.LatLng).y; })
+      .attr("r",0).transition().duration(100).attr("r",function(d) {
+        return map.getZoom() * 3 * d.value;
+      });
+
+    feature.exit()
+      .transition().duration(250).attr("r",0).remove();
 
     map.on("viewreset", resetOverlay);
-  });
+  };
 
 
   // WEBSOCKETS
@@ -72,12 +76,14 @@ $(function() {
   };
 
   ws.onmessage = function(e) {
-    // var data = JSON.parse(e.data);
-    console.log(e.data);
+    var msg = JSON.parse(e.data);
+    console.log(msg);
+
+    Redch.collection[msg.id] = msg;
+    Redch.draw(Redch.collection);
   };
 
   ws.onopen = function(e) {
     console.log('WebSocket connection open to ' + Redch.WS.uri);
-    ws.send('hello');
   };
 });

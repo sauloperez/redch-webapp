@@ -1,6 +1,7 @@
 require 'sinatra/base'
 require 'em-websocket'
 require 'amqp'
+require 'json'
 
 module Redch
 
@@ -21,7 +22,8 @@ module Redch
             p ['open', ws.object_id]
 
             channel.queue("redch.test", :auto_delete => true).subscribe do |payload|
-              p "message from queue 'redch.test' queue: #{payload}"
+              p "got from 'redch.test' queue: #{payload}"
+              p "message sent: #{payload}"
 
               ws.send payload
             end
@@ -32,7 +34,7 @@ module Redch
           end
 
           ws.onclose do |event|
-            p ['close', ws.object_id, event.code, event.reason]
+            p ['close', ws.object_id, event]
           end
         end
 

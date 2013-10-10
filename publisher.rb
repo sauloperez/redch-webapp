@@ -18,9 +18,9 @@ module Redch
           @exchange = channel.direct("")
 
           @timer = EventMachine.add_periodic_timer(@timespan) {
-            paylaod = data(@filename)
-            @exchange.publish paylaod, :routing_key => "redch.test"
-            p "published: #{paylaod}"
+            payload = data(@filename)
+            @exchange.publish payload.to_json, :routing_key => "redch.test"
+            p "published: #{payload.to_json}"
           }
         end
       end
@@ -32,18 +32,18 @@ module Redch
       @data ||= array.values[0]
 
       @i ||= 0
-      if @i == @data.length
-        AMQP.stop{ EM.stop }
-        exit(0)
-      end
+      # if @i == @data.length
+      #   AMQP.stop{ EM.stop }
+      #   exit(0)
+      # end
 
       value = @data[@i]
-      @i += 1 unless @i == @data.length
+      @i = (@i + 1) % @data.length
       value
     end
   end
 
 end
 
-Redch::Publisher.new("redch.test", 2, "../public/data.json").run
+Redch::Publisher.new("redch.test", 1, "../public/data.json").run
 
