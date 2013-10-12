@@ -2,6 +2,8 @@ require 'amqp'
 require 'pathname'
 require 'pp'
 require 'json'
+require 'random-location'
+require 'securerandom'
 
 module Redch
 
@@ -9,7 +11,7 @@ module Redch
     def initialize(routing_key, timespan, filename)
       @routing_key = routing_key
       @timespan = timespan # in seconds
-      @filename = File.expand_path(filename, Pathname.new(__FILE__).realpath)
+      # @filename = File.expand_path(filename, Pathname.new(__FILE__).realpath)
     end
 
     def run
@@ -18,7 +20,8 @@ module Redch
           @exchange = channel.direct("")
 
           @timer = EventMachine.add_periodic_timer(@timespan) {
-            payload = data(@filename)
+            # payload = data(@filename)
+            payload = data
             @exchange.publish payload.to_json, :routing_key => "redch.test"
             p "published: #{payload.to_json}"
           }
@@ -27,19 +30,23 @@ module Redch
     end
 
     private
-    def data(filename)
-      array = JSON.parse File.read(filename)
-      @data ||= array.values[0]
+    def data
+      # array = JSON.parse File.read(filename)
+      # @data ||= array.values[0]
 
-      @i ||= 0
-      # if @i == @data.length
-      #   AMQP.stop{ EM.stop }
-      #   exit(0)
-      # end
+      # @i ||= 0
 
-      value = @data[@i]
-      @i = (@i + 1) % @data.length
-      value
+      # value = @data[@i]
+      # @i = (@i + 1) % @data.length
+      # value
+
+      coord = RandomLocation.nearby(41.65038, 1.13897, 5_000)
+      {
+        id: SecureRandom.uuid,
+        lat: coord[0],
+        lng: coord[1],
+        value: rand
+      }
     end
   end
 

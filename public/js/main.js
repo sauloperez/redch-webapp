@@ -3,6 +3,7 @@ $(function() {
 
   window.Redch = {};
   Redch.collection = [];
+  Redch.collectionIndex = 0;
 
   var map = Redch.map = L.map('map').setView([41.66471, 2.10938], 8)
 
@@ -30,9 +31,9 @@ $(function() {
 
   Redch.draw = function(collection) {
     // Add a LatLng object to each item in the dataset
-    collection.forEach(function(d) {
-      d.LatLng = new L.LatLng(d.lat, d.lng);
-    });
+    // collection.forEach(function(d) {
+    //   d.LatLng = new L.LatLng(d.lat, d.lng);
+    // });
 
     var feature = g.selectAll("circle")
       .data(collection);
@@ -42,11 +43,13 @@ $(function() {
       .style("fill", function(d) {
         var d = d.value;
         var returnColor;
-        if (d > 0.2) returnColor = "red";
-        else if (d > 0.1) returnColor = "orange";
-        else returnColor = "yellow";
+        if (d > 0.75) returnColor = "red";
+        else if (d > 0.50) returnColor = "orange";
+        else if (d > 0.25) returnColor = "yellow";
+        else returnColor = "green";
         return returnColor;
       })
+      .style("fill-opacity", 0.5)
       // .attr("r", function (d) { return d.value * 20; })
       .attr("cx", function(d) { return project(d.LatLng).x; })
       .attr("cy", function(d) { return project(d.LatLng).y; })
@@ -76,11 +79,17 @@ $(function() {
   };
 
   ws.onmessage = function(e) {
-    var msg = JSON.parse(e.data);
+    var msg = JSON.parse(e.data),
+        i = Redch.collectionIndex;
+
+    msg.LatLng = new L.LatLng(msg.lat, msg.lng);
+
     console.log(msg);
 
-    Redch.collection[msg.id] = msg;
+    Redch.collection[i] = msg;
     Redch.draw(Redch.collection);
+
+    Redch.collectionIndex++;
   };
 
   ws.onopen = function(e) {
