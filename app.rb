@@ -21,10 +21,10 @@ module Redch
           ws.onopen do |handshake|
             p ['open', ws.object_id]
 
-            channel.queue("redch.test", :auto_delete => true).subscribe do |payload|
+            channel.queue("redch.test", :auto_delete => true, :persistent => false).subscribe do |payload|
               p "got from 'redch.test' queue: #{payload}"
-              p "message sent: #{payload}"
 
+              p "message forwarded"
               ws.send payload
             end
           end

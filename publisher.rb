@@ -1,6 +1,4 @@
 require 'amqp'
-require 'pathname'
-require 'pp'
 require 'json'
 require 'random-location'
 require 'securerandom'
@@ -8,10 +6,9 @@ require 'securerandom'
 module Redch
 
   class Publisher
-    def initialize(routing_key, timespan, filename)
+    def initialize(routing_key, timespan)
       @routing_key = routing_key
       @timespan = timespan # in seconds
-      # @filename = File.expand_path(filename, Pathname.new(__FILE__).realpath)
     end
 
     def run
@@ -20,7 +17,6 @@ module Redch
           @exchange = channel.direct("")
 
           @timer = EventMachine.add_periodic_timer(@timespan) {
-            # payload = data(@filename)
             payload = data
             @exchange.publish payload.to_json, :routing_key => "redch.test"
             p "published: #{payload.to_json}"
@@ -31,16 +27,7 @@ module Redch
 
     private
     def data
-      # array = JSON.parse File.read(filename)
-      # @data ||= array.values[0]
-
-      # @i ||= 0
-
-      # value = @data[@i]
-      # @i = (@i + 1) % @data.length
-      # value
-
-      coord = RandomLocation.nearby(41.65038, 1.13897, 5_000)
+      coord = RandomLocation.near_by(41.65038, 1.13897, 70_000)
       {
         id: SecureRandom.uuid,
         lat: coord[0],
@@ -52,5 +39,5 @@ module Redch
 
 end
 
-Redch::Publisher.new("redch.test", 1, "../public/data.json").run
+Redch::Publisher.new("redch.test", 2).run
 
