@@ -1,7 +1,11 @@
 $(function() {
   'use strict';
 
-  window.Redch = {};
+  var Redch = window.Redch = {};
+
+  // Let the global Redch object serve as a global event bus
+  $.extend(Redch, Events);
+
   Redch.collection = [];
   Redch.collectionIndex = 0;
 
@@ -30,11 +34,6 @@ $(function() {
   };
 
   Redch.draw = function(collection) {
-    // Add a LatLng object to each item in the dataset
-    // collection.forEach(function(d) {
-    //   d.LatLng = new L.LatLng(d.lat, d.lng);
-    // });
-
     var feature = g.selectAll("circle")
       .data(collection);
 
@@ -50,11 +49,10 @@ $(function() {
         return returnColor;
       })
       .style("fill-opacity", 0.5)
-      // .attr("r", function (d) { return d.value * 20; })
       .attr("cx", function(d) { return project(d.LatLng).x; })
       .attr("cy", function(d) { return project(d.LatLng).y; })
       .attr("r",0).transition().duration(100).attr("r",function(d) {
-        return map.getZoom() * 3 * d.value;
+        return map.getZoom() * 2 * d.value;
       });
 
     feature.exit()
@@ -64,22 +62,14 @@ $(function() {
   };
 
 
-  // WEBSOCKETS
-  Redch.WS = {};
+  /*
+   * WebSocket handling
+   */
+  Redch.WS = new WSAdapter({ eventBus: Redch });
+  Redch.WS.connect();
 
-  Redch.WS.scheme = "ws://";
-  Redch.WS.port = 8080;
-  Redch.WS.uri = Redch.WS.scheme + window.document.location.hostname + ":" + Redch.WS.port;
-
-  var ws = Redch.WS.connection = new WebSocket(Redch.WS.uri);
-
-  // Log errors
-  ws.onerror = function(error) {
-    console.log('WebSocket Error: ' + error);
-  };
-
-  ws.onmessage = function(e) {
-    var msg = JSON.parse(e.data),
+  Redch.on("ws:message", function(data) {
+    var msg = JSON.parse(data),
         i = Redch.collectionIndex;
 
     msg.LatLng = new L.LatLng(msg.lat, msg.lng);
@@ -90,9 +80,5 @@ $(function() {
     Redch.draw(Redch.collection);
 
     Redch.collectionIndex++;
-  };
-
-  ws.onopen = function(e) {
-    console.log('WebSocket connection open to ' + Redch.WS.uri);
-  };
+  });
 });
