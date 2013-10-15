@@ -8,10 +8,17 @@ var Visualization = function(options) {
     throw new Error("collection not specified");
   }
 
+  var defaults = {
+    center: [41.82749, 1.60584],
+    zoomLevel: 8
+  }
+
   options || (options = {});
 
-  this.center = options.center || [41.73509, 1.51498];
-  this.zoomLevel = options.zoomLevel || 8;
+  _.defaults(options, defaults);
+
+  this.center = options.center;
+  this.zoomLevel = options.zoomLevel;
   this.collection = options.collection;
 
   this.initialize.apply(this);
