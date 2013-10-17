@@ -1,46 +1,51 @@
 require 'sinatra/base'
-require 'em-websocket'
 require 'amqp'
 require 'json'
 
 module Redch
 
-  EventMachine.run do
-    class App < Sinatra::Base
-      get '/' do
-        erb :index
+  class App < Sinatra::Base
+
+    configure do
+      enable :logging
+      EM.next_tick do
+        # url = ENV['AMQP_URL'] || "amqp://guest:guest@localhost"
+        AMQP.connection = AMQP.connect :host => '127.0.0.1'
       end
     end
+    
+    get '/' do
+      erb :index
+    end
 
-    AMQP.connect(:host => '127.0.0.1') do |connection, open_ok|
-      puts "Connected to AMQP broker. Running #{AMQP::VERSION} version of the gem..."
+    get '/stream', provides: 'text/event-stream' do
+      stream :keep_open do |out|
+        p "New connection:  #{out}"
 
-      AMQP::Channel.new(connection) do |channel, open_ok|
-
-        EventMachine::WebSocket.start(:host => '0.0.0.0', :port => 8080) do |ws|
-          ws.onopen do |handshake|
-            p ['open', ws.object_id]
-
-            channel.queue("redch.test", :auto_delete => true, :persistent => false).subscribe do |payload|
-              p "got from 'redch.test' queue: #{payload}"
-
-              p "message forwarded"
-              ws.send payload
+        AMQP::Channel.new do |channel|
+          channel.queue('', exclusive: true) do |queue|
+            # create a queue and bind it to the fanout exchange
+            queue.bind(channel.fanout("samples")).subscribe do |payload|
+              p "#{payload} forwarded to clients"
+              out << "data: #{payload}\n\n"
             end
           end
 
-          ws.onmessage do |msg|
-            p ['open', msg]
-          end
+          # add a timer to keep the connection alive 
+          timer = EM.add_periodic_timer(20) { out << ":\n" } 
 
-          ws.onclose do |event|
-            p ['close', ws.object_id, event]
+          # clean up when the user closes the stream
+          out.callback do
+            timer.cancel
+            channel.close
+
+            p "Removed connection:  #{out}"
           end
         end
-
       end
     end
 
-    App.run!({:port => 3000})
   end
+
+  App.run!({:port => 3000})
 end

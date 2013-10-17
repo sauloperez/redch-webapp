@@ -14,17 +14,19 @@ $(function() {
     collection: Redch.collection
   });
 
-  // WebSocket handling
-  Redch.WS = new WSAdapter({ eventBus: Redch });
-  Redch.WS.connect();
+  // Server communication
+  Redch.communicator = new Communicator({ 
+    eventBus: Redch,
+    uri: '/stream' 
+  });
+  Redch.communicator.connect();
 
-  Redch.on("ws:message", function(data) {
-    var msg = JSON.parse(data),
-        i = Redch.collectionIndex;
+  Redch.on("communicator:message", function(msg) {
+    console.log("Received: " + msg);
+
+    var i = Redch.collectionIndex;
 
     msg.LatLng = new L.LatLng(msg.lat, msg.lng);
-
-    console.log(msg);
 
     Redch.collection[i] = msg;
     Redch.visualization.draw();
