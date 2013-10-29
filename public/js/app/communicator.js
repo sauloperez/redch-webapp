@@ -31,7 +31,7 @@ var Communicator = function(options) {
   this.initialize.apply(this);
 };
 
-$.extend(Communicator.prototype, Events, {
+$.extend(Communicator.prototype, Backbone.Events, {
 
   initialize: function() {},
 
@@ -49,6 +49,7 @@ $.extend(Communicator.prototype, Events, {
     };
 
     conn.onmessage = function(e) {
+      console.log('Communicator message received: ' + e.data);
       self.eventBus.trigger(self.namespace + ":message", self.parse(e.data));
     };
 
