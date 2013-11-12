@@ -9,11 +9,10 @@ module Redch
     configure do
       enable :logging
       EM.next_tick do
-        # url = ENV['AMQP_URL'] || "amqp://guest:guest@localhost"
-        AMQP.connection = AMQP.connect :host => '127.0.0.1'
+        AMQP.connection = AMQP.connect :host => ENV['AMQP_HOST']
       end
     end
-    
+
     get '/' do
       erb :index
     end
@@ -31,8 +30,8 @@ module Redch
             end
           end
 
-          # add a timer to keep the connection alive 
-          timer = EM.add_periodic_timer(20) { out << ":\n" } 
+          # add a timer to keep the connection alive
+          timer = EM.add_periodic_timer(20) { out << ":\n" }
 
           # clean up when the user closes the stream
           out.callback do
