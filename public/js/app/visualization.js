@@ -1,7 +1,7 @@
 // Visualization
 // -----------------
 
-// Contains all the stuff to show the map and its overlay draws
+// Contains all the stuff to show the map and its overlaid draws
 
 var Visualization = function(options) {
   if (options && !options.collection) {
@@ -70,9 +70,9 @@ $.extend(Visualization.prototype, Backbone.Events, {
       .style("fill", function(model) {
         var d = model.get('value');
         var returnColor;
-        if (d > 0.75) returnColor = "red";
-        else if (d > 0.50) returnColor = "orange";
-        else if (d > 0.25) returnColor = "yellow";
+        if (d >= 0.2) returnColor = "red";
+        else if (d >= 0.1) returnColor = "orange";
+        else if (d >= 0.05) returnColor = "yellow";
         else returnColor = "green";
         return returnColor;
       })
