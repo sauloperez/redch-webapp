@@ -43,8 +43,5 @@ module Redch
         end
       end
     end
-
   end
-
-  App.run!({:port => 3000})
 end
