@@ -1,6 +1,6 @@
 require_relative "./spec_helper"
 
-describe "Redch::App" do
+describe Redch::App do
   subject { last_response }
 
   context "/" do
@@ -9,5 +9,9 @@ describe "Redch::App" do
     end
 
     it { should be_ok }
+
+    it "should show a map" do
+      expect(subject.body).to match /id="map"/
+    end
   end
 end

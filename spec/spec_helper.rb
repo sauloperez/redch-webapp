@@ -1,5 +1,4 @@
 ENV['RACK_ENV'] = 'test'
-ENV['AMQP_HOST'] = '127.0.0.1'
 
 # Pull in non-grouped gems plus 'test' group
 require 'bundler/setup'
@@ -12,6 +11,6 @@ module RSpecMixin
   def app() Redch::App end
 end
 
-RSpec.configure { |c|
+RSpec.configure do |c|
   c.include RSpecMixin
-}
+end

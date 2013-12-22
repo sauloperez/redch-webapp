@@ -4,8 +4,43 @@ require 'json'
 
 module Redch
 
-  class App < Sinatra::Base
+  class Subscription
+    attr_reader :stream, :timer
 
+    INTERVAL = 20
+
+    def initialize(stream)
+      @stream = stream
+    end
+
+    def to(exchange_name)
+      channel  = AMQP::Channel.new(AMQP.connection)
+      queue    = channel.queue('', exclusive: true)
+      exchange = channel.fanout(exchange_name)
+
+      queue.bind(exchange).subscribe do |payload|
+        p "#{payload} forwarded to clients"
+        stream << "data: #{payload}\n\n"
+      end
+
+      # add a timer to keep the connection alive
+      @timer = EM.add_periodic_timer(INTERVAL) { stream << ":\n" }
+
+      # clean up when the user closes the stream
+      stream.callback do
+        timer.cancel
+        channel.close
+
+        p "Removed connection:  #{stream.object_id}"
+      end
+    end
+  end
+
+  def self.subscribe_to(exchange_name, stream)
+    Subscription.new(stream).to exchange_name
+  end
+
+  class App < Sinatra::Base
     configure do
       enable :logging
       EM.next_tick do
@@ -19,29 +54,11 @@ module Redch
 
     get '/stream', provides: 'text/event-stream' do
       stream :keep_open do |out|
-        p "New connection:  #{out}"
+        p "New connection: #{out.object_id}"
 
-        AMQP::Channel.new do |channel|
-          channel.queue('', exclusive: true) do |queue|
-            # create a queue and bind it to the fanout exchange
-            queue.bind(channel.fanout("samples")).subscribe do |payload|
-              p "#{payload} forwarded to clients"
-              out << "data: #{payload}\n\n"
-            end
-          end
-
-          # add a timer to keep the connection alive
-          timer = EM.add_periodic_timer(20) { out << ":\n" }
-
-          # clean up when the user closes the stream
-          out.callback do
-            timer.cancel
-            channel.close
-
-            p "Removed connection:  #{out}"
-          end
-        end
+        Redch.subscribe_to('samples', out)
       end
     end
+
   end
 end
