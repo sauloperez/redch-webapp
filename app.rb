@@ -4,17 +4,19 @@ require 'json'
 
 module Redch
 
-  class Subscription
-    attr_reader :stream, :timer
+  EXCHANGE_NAME = 'samples'
 
-    INTERVAL = 20
+  class StreamingSubscription
+    attr_reader :stream, :timer, :channel
+
+    INTERVAL = 20 # in seconds
 
     def initialize(stream)
       @stream = stream
     end
 
     def to(exchange_name)
-      channel  = AMQP::Channel.new(AMQP.connection)
+      @channel  = AMQP::Channel.new(AMQP.connection)
       queue    = channel.queue('', exclusive: true)
       exchange = channel.fanout(exchange_name)
 
@@ -23,11 +25,16 @@ module Redch
         stream << "data: #{payload}\n\n"
       end
 
-      # add a timer to keep the connection alive
-      @timer = EM.add_periodic_timer(INTERVAL) { stream << ":\n" }
+      keep_stream_alive_each INTERVAL
 
-      # clean up when the user closes the stream
-      stream.callback do
+      # on stream close
+      stream.callback { clean_up }
+
+      def keep_stream_alive_each(interval)
+        @timer = EM.add_periodic_timer(interval) { stream << ":\n" }
+      end
+
+      def clean_up
         timer.cancel
         channel.close
 
@@ -37,7 +44,7 @@ module Redch
   end
 
   def self.subscribe_to(exchange_name, stream)
-    Subscription.new(stream).to exchange_name
+    StreamingSubscription.new(stream).to exchange_name
   end
 
   class App < Sinatra::Base
@@ -56,7 +63,7 @@ module Redch
       stream :keep_open do |out|
         p "New connection: #{out.object_id}"
 
-        Redch.subscribe_to('samples', out)
+        Redch.subscribe_to(EXCHANGE_NAME, out)
       end
     end
 
