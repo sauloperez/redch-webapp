@@ -4,8 +4,6 @@ require 'json'
 
 module Redch
 
-  EXCHANGE_NAME = 'samples'
-
   class StreamingSubscription
     attr_reader :stream, :timer, :channel
 
@@ -16,7 +14,7 @@ module Redch
     end
 
     def to(exchange_name)
-      @channel  = AMQP::Channel.new(AMQP.connection)
+      @channel = AMQP::Channel.new(AMQP.connection)
       queue    = channel.queue('', exclusive: true)
       exchange = channel.fanout(exchange_name)
 
@@ -29,21 +27,22 @@ module Redch
 
       # on stream close
       stream.callback { clean_up }
+    end
 
-      def keep_stream_alive_each(interval)
-        @timer = EM.add_periodic_timer(interval) { stream << ":\n" }
-      end
+    def keep_stream_alive_each(interval)
+      @timer = EM.add_periodic_timer(interval) { stream << ":\n" }
+    end
 
-      def clean_up
-        timer.cancel
-        channel.close
+    def clean_up
+      timer.cancel
+      channel.close
 
-        p "Removed connection:  #{stream.object_id}"
-      end
+      p "Removed connection:  #{stream.object_id}"
     end
   end
 
-  def self.subscribe_to(exchange_name, stream)
+  def self.subscribe_to(exchange_name, *args)
+    stream = args[:stream]
     StreamingSubscription.new(stream).to exchange_name
   end
 
@@ -63,7 +62,7 @@ module Redch
       stream :keep_open do |out|
         p "New connection: #{out.object_id}"
 
-        Redch.subscribe_to(EXCHANGE_NAME, out)
+        Redch.subscribe_to 'samples', stream: out
       end
     end
 
