@@ -1,31 +1,13 @@
 require_relative "./spec_helper"
 
 describe "/stream" do
-  let(:exchange) { double AMQP::Exchange }
-  let(:queue) { double AMQP::Queue }
-  let(:channel) { double AMQP::Channel }
   let(:exchange_name) { "samples" }
-  let(:stream) { double }
   let(:em) { double EM }
 
   before :each do
-    em.stub(:add_periodic_timer)
-    em.stub(:run)
-
-    channel.stub(:queue) { queue }
-    channel.stub(:fanout) { exchange }
-    channel.stub(:close)
-
-    exchange.stub(:name) { "" }
-
-    queue.stub(:bind).with(exchange) { queue }
-    queue.stub(:name) { "" }
-    queue.stub(:subscribe)
-
-    AMQP::Channel.stub(:new) { channel }
-
-    stream.stub(:callback)
-    stream.stub(:<<)
+    mock_EM(em)
+    mock_amqp
+    mock_stream
   end
 
   it 'should open a streaming connection' do

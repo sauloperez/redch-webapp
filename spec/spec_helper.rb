@@ -14,3 +14,33 @@ end
 RSpec.configure do |c|
   c.include RSpecMixin
 end
+
+def mock_EM(em = nil)
+  em = double EM if em.nil?
+  em.stub(:add_periodic_timer)
+  em.stub(:run)
+end
+
+def mock_amqp
+  exchange = double AMQP::Exchange
+  queue = double AMQP::Queue
+  channel = double AMQP::Channel
+
+  channel.stub(:queue) { queue }
+  channel.stub(:fanout) { exchange }
+  channel.stub(:close)
+
+  exchange.stub(:name) { "" }
+
+  queue.stub(:bind).with(exchange) { queue }
+  queue.stub(:name) { "" }
+  queue.stub(:subscribe)
+
+  AMQP::Channel.stub(:new) { channel }
+end
+
+def mock_stream
+  stream = double
+  stream.stub(:callback)
+  stream.stub(:<<)
+end
