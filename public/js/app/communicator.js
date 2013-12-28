@@ -2,12 +2,12 @@
 // -------------------
 
 // It forwards all the underlying API events to the application
-// event aggregator (or event bus). The intention of
-// this is to decouple the specific WebSockets/ServerSentEvents implementations
-// from the application's use of them.
+// event aggregator (or event bus). It is intended to decouple 
+// the specific WebSockets/ServerSentEvents implementations
+// from the actual use.
 
 var Communicator = function(options) {
-  if (options && !options.eventBus) {
+  if (!options || !options.eventBus) {
     throw new Error("eventBus not specified");
   }
 
@@ -27,6 +27,9 @@ var Communicator = function(options) {
 
   this.namespace = "communicator";
   this.eventBus = options.eventBus;
+
+  // Make the config accessible
+  this.config = _.extend({}, options);
 
   this.initialize.apply(this);
 };
