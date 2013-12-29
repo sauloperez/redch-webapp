@@ -42,7 +42,7 @@ module Redch
   end
 
   def self.subscribe_to(exchange_name, *args)
-    stream = args[:stream]
+    stream = args[0][:stream]
     StreamingSubscription.new(stream).to exchange_name
   end
 

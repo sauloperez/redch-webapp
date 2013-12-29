@@ -43,4 +43,5 @@ def mock_stream
   stream = double
   stream.stub(:callback)
   stream.stub(:<<)
+  stream
 end

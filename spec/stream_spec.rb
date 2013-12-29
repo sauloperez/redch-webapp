@@ -7,7 +7,7 @@ describe "/stream" do
   before :each do
     mock_EM(em)
     mock_amqp
-    mock_stream
+    stream = mock_stream
   end
 
   it 'should open a streaming connection' do
