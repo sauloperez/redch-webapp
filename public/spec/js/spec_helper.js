@@ -1,10 +1,16 @@
 var SpecHelper = {
-  sleep: function(milliseconds) {
-    var start = new Date().getTime();
-    for (var i = 0; i < 1e7; i++) {
-      if ((new Date().getTime() - start) > milliseconds){
-        break;
+
+  mockEventBus: function() {
+    return {
+      events: {},
+      trigger: function(event) {
+        var handler = this.events[event]
+        if (handler) handler.call(this);
+      },
+      on: function(event, func) {
+        this.events[event] = func;
       }
-    }
+    };
   }
+  
 };

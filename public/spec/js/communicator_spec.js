@@ -1,15 +1,6 @@
 describe('Redch.Communicator', function() {
   var comm = Communicator,
-      eventBusMock = {
-        events: {},
-        trigger: function(event) {
-          var handler = this.events[event]
-          if (handler) handler.call(this);
-        },
-        on: function(event, func) {
-          this.events[event] = func;
-        }
-      };
+      eventBusMock = SpecHelper.mockEventBus();
 
   beforeEach(function() {
     comm = new Communicator({
