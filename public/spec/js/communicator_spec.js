@@ -4,7 +4,8 @@ describe('Redch.Communicator', function() {
 
   beforeEach(function() {
     comm = new Communicator({
-      eventBus: eventBusSpy
+      eventBus: eventBusSpy,
+      uri: '/stream'
     });
   });
 
@@ -24,7 +25,7 @@ describe('Redch.Communicator', function() {
     });
   });
 
-  it("sets the port", function() {
+  it("accepts a port", function() {
     c = new Communicator({
       eventBus: eventBusSpy,
       port: 3000
@@ -32,12 +33,31 @@ describe('Redch.Communicator', function() {
     expect(c.config.port).toBe(3000);
   });
 
-  it("sets the hostname", function() {
+  it("accepts a hostname", function() {
     c = new Communicator({
       eventBus: eventBusSpy,
       hostname: "www.redch.org"
     });
     expect(c.config.hostname).toBe("www.redch.org");
+  });
+
+  describe("when no URI is specified", function(){
+    it("builds it with the hostname and port provided", function() {
+      c = new Communicator({
+        eventBus: eventBusSpy,
+        hostname: "www.redch.org",
+        port: 3000
+      });
+      expect(c.uri).toBe("http://www.redch.org:3000");
+    });
+  });
+
+  it("accepts an URI", function() {
+    c = new Communicator({
+      eventBus: eventBusSpy,
+      uri: "http://www.redch.org:8888"
+    });
+    expect(c.uri).toBe("http://www.redch.org:8888");
   });
 
 });
