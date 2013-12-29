@@ -43,22 +43,22 @@ $.extend(Communicator.prototype, Backbone.Events, {
   },
 
   connect: function () {
-    var self = this,
-        conn = new EventSource(this.uri);
+    var conn = new EventSource(this.uri);
 
-    conn.onerror = function(error) {
-      console.log('Communicator Error: ' + error);
-      self.eventBus.trigger(self.namespace + ":error", error);
-    };
+    conn.onerror = this.onError;
+    conn.onmessage = this.onMessage;
+    conn.onopen = this.onOpen;
+  },
 
-    conn.onmessage = function(e) {
-      console.log('Communicator message received: ' + e.data);
-      self.eventBus.trigger(self.namespace + ":message", self.parse(e.data));
-    };
+  onError: function(error) {
+    this.eventBus.trigger(this.namespace + ":error", error);
+  },
 
-    conn.onopen = function(e) {
-      console.log('Communicator connection open to ' + self.uri);
-      self.eventBus.trigger(self.namespace + ":open", e);
-    };
+  onMessage: function(e) {
+    this.eventBus.trigger(this.namespace + ":message", this.parse(e.data));
+  },
+
+  onOpen: function(e) {
+    this.eventBus.trigger(this.namespace + ":open", e);
   }
 });

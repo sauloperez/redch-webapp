@@ -1,10 +1,19 @@
 describe('Redch.Communicator', function() {
   var comm = Communicator,
-      eventBusSpy = sinon.spy();
+      eventBusMock = {
+        events: {},
+        trigger: function(event) {
+          var handler = this.events[event]
+          if (handler) handler.call(this);
+        },
+        on: function(event, func) {
+          this.events[event] = func;
+        }
+      };
 
   beforeEach(function() {
     comm = new Communicator({
-      eventBus: eventBusSpy,
+      eventBus: eventBusMock,
       uri: '/stream'
     });
   });
@@ -27,7 +36,7 @@ describe('Redch.Communicator', function() {
 
   it("accepts a port", function() {
     c = new Communicator({
-      eventBus: eventBusSpy,
+      eventBus: eventBusMock,
       port: 3000
     });
     expect(c.config.port).toBe(3000);
@@ -35,7 +44,7 @@ describe('Redch.Communicator', function() {
 
   it("accepts a hostname", function() {
     c = new Communicator({
-      eventBus: eventBusSpy,
+      eventBus: eventBusMock,
       hostname: "www.redch.org"
     });
     expect(c.config.hostname).toBe("www.redch.org");
@@ -44,7 +53,7 @@ describe('Redch.Communicator', function() {
   describe("when no URI is specified", function(){
     it("builds it with the hostname and port provided", function() {
       c = new Communicator({
-        eventBus: eventBusSpy,
+        eventBus: eventBusMock,
         hostname: "www.redch.org",
         port: 3000
       });
@@ -54,10 +63,26 @@ describe('Redch.Communicator', function() {
 
   it("accepts an URI", function() {
     c = new Communicator({
-      eventBus: eventBusSpy,
+      eventBus: eventBusMock,
       uri: "http://www.redch.org:8888"
     });
     expect(c.uri).toBe("http://www.redch.org:8888");
   });
 
+  describe("events", function() {
+    var eventFunc = sinon.spy();
+
+    beforeEach(function() {
+      eventBusMock.on('communicator:open', eventFunc);
+      connectStub = sinon.stub(comm, 'connect', function() {
+        comm.onOpen();
+      });
+      comm.connect();
+    });
+
+    it("triggers namespaced events", function() {
+      expect(eventFunc).toHaveBeenCalled();
+    });
+  });
+  
 });
