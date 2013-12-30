@@ -2,7 +2,7 @@
 // -------------------
 
 // It forwards all the underlying API events to the application
-// event aggregator (or event bus). It is intended to decouple 
+// event aggregator (or event bus). It is intended to decouple
 // the specific WebSockets/ServerSentEvents implementations
 // from the actual use.
 
@@ -31,7 +31,7 @@ var Communicator = function(options) {
   // Make the config accessible
   this.config = _.extend({}, options);
 
-  this.initialize.apply(this);
+  this.initialize.apply(this, arguments);
 };
 
 $.extend(Communicator.prototype, Backbone.Events, {
@@ -43,11 +43,18 @@ $.extend(Communicator.prototype, Backbone.Events, {
   },
 
   connect: function () {
-    var conn = new EventSource(this.uri);
+    var self = this,
+        conn = new EventSource(this.uri);
 
-    conn.onerror = this.onError;
-    conn.onmessage = this.onMessage;
-    conn.onopen = this.onOpen;
+    conn.onerror = function(e) {
+      self.onError.call(self, e);
+    }
+    conn.onmessage = function(e) {
+      self.onMessage.call(self, e);
+    };
+    conn.onopen = function(e) {
+      self.onOpen.call(self, e);
+    };
   },
 
   onError: function(error) {

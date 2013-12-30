@@ -61,19 +61,40 @@ describe('Redch.Communicator', function() {
   });
 
   describe("events", function() {
-    var eventFunc = sinon.spy();
+    var onOpenHandler = sinon.spy(),
+        onMessageHandler = sinon.spy(),
+        data = "simple message";
 
     beforeEach(function() {
-      eventBusMock.on('communicator:open', eventFunc);
+      eventBusMock.on('communicator:open', onOpenHandler);
+      eventBusMock.on('communicator:message', onMessageHandler);
       connectStub = sinon.stub(comm, 'connect', function() {
         comm.onOpen();
+        comm.onMessage({ data: JSON.stringify(data) });
       });
       comm.connect();
     });
 
     it("triggers namespaced events", function() {
-      expect(eventFunc).toHaveBeenCalled();
+      expect(onOpenHandler).toHaveBeenCalled();
+    });
+
+    it("triggers an event once the connection is open", function() {
+      expect(onOpenHandler).toHaveBeenCalled();
+    });
+
+    it("triggers an event when a message is received", function() {
+      expect(onMessageHandler).toHaveBeenCalled();
+    });
+
+    it("passes the message as event handler argument", function() {
+      var message;
+      eventBusMock.on('communicator:message', function(msg) {
+        message = msg;
+      });
+      comm.connect();
+      expect(data).toBeTruthy();
     });
   });
-  
+
 });
