@@ -73,11 +73,17 @@ describe('Redch.Communicator', function() {
       c.connect();
     });
 
-    it("does not open a new connection", function() {
+    it("does not trigger a new open event", function() {
       var reopenHandler = sinon.spy();
       eventBusMock.on('communicator:open', reopenHandler);
       c.connect();
       expect(reopenHandler).not.toHaveBeenCalled();
+    });
+
+    it("does not create a new connection object", function() {
+      var oldConnection = c._connection;
+      c.connect();
+      expect(c._connection).toBe(oldConnection);
     });
 
     it("can be closed", function() {
