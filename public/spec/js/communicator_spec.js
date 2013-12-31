@@ -1,6 +1,8 @@
 describe('Redch.Communicator', function() {
-  var comm = Communicator,
-      eventBusMock = SpecHelper.mockEventBus();
+  var eventBusMock = SpecHelper.mockEventBus(),
+      onOpenHandler = sinon.spy(),
+      onMessageHandler = sinon.spy(),
+      data = "simple message";
 
   beforeEach(function() {
     comm = new Communicator({
@@ -26,7 +28,7 @@ describe('Redch.Communicator', function() {
   });
 
   it("accepts a port", function() {
-    c = new Communicator({
+    var c = new Communicator({
       eventBus: eventBusMock,
       port: 3000
     });
@@ -34,7 +36,7 @@ describe('Redch.Communicator', function() {
   });
 
   it("accepts a hostname", function() {
-    c = new Communicator({
+    var c = new Communicator({
       eventBus: eventBusMock,
       hostname: "www.redch.org"
     });
@@ -43,7 +45,7 @@ describe('Redch.Communicator', function() {
 
   describe("when no URI is specified", function(){
     it("builds it with the hostname and port provided", function() {
-      c = new Communicator({
+      var c = new Communicator({
         eventBus: eventBusMock,
         hostname: "www.redch.org",
         port: 3000
@@ -53,26 +55,65 @@ describe('Redch.Communicator', function() {
   });
 
   it("accepts an URI", function() {
-    c = new Communicator({
+    var c = new Communicator({
       eventBus: eventBusMock,
       uri: "http://www.redch.org:8888"
     });
     expect(c.uri).toBe("http://www.redch.org:8888");
   });
 
+  describe("when already connect", function() {
+    var c;
+
+    beforeEach(function() {
+      c = new Communicator({
+        eventBus: eventBusMock,
+        uri: '/stream'
+      });
+      c.connect();
+    });
+
+    it("does not open a new connection", function() {
+      var reopenHandler = sinon.spy();
+      eventBusMock.on('communicator:open', reopenHandler);
+      c.connect();
+      expect(reopenHandler).not.toHaveBeenCalled();
+    });
+
+    it("can be closed", function() {
+      c.close();
+      expect(c._connection).toBeFalsy();
+    });
+  });
+
   describe("events", function() {
     var onOpenHandler = sinon.spy(),
         onMessageHandler = sinon.spy(),
-        data = "simple message";
+        invalidOriginComm;
 
     beforeEach(function() {
       eventBusMock.on('communicator:open', onOpenHandler);
       eventBusMock.on('communicator:message', onMessageHandler);
-      connectStub = sinon.stub(comm, 'connect', function() {
-        comm.onOpen({});
-        comm.onMessage({ data: JSON.stringify(data) });
+      sinon.stub(comm, 'connect', function() {
+        comm.onOpen({ origin: comm.uri });
+        comm.onMessage({
+          origin: comm.uri,
+          data: JSON.stringify(data)
+        });
       });
       comm.connect();
+
+      invalidOriginComm = new Communicator({
+        eventBus: eventBusMock,
+        uri: '/stream'
+      });
+      sinon.stub(invalidOriginComm, 'connect', function() {
+        invalidOriginComm.onOpen({ origin: invalidOriginComm.uri });
+        invalidOriginComm.onMessage({
+          origin: "www.invalidorigin.com",
+          data: JSON.stringify(data)
+        });
+      });
     });
 
     it("triggers namespaced events", function() {
@@ -94,6 +135,12 @@ describe('Redch.Communicator', function() {
       });
       comm.connect();
       expect(message).toBeTruthy();
+    });
+
+    it("throws an Error if message comes from invalid origin", function() {
+      expect(function() {
+        invalidOriginComm.connect();
+      }).toThrow(new Error("Invalid message origin"));
     });
   });
 

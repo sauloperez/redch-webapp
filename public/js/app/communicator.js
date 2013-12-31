@@ -42,9 +42,20 @@ $.extend(Communicator.prototype, Backbone.Events, {
     return JSON.parse(data);
   },
 
-  connect: function () {
+  connect: function() {
+    if (this._connection) return;
+    this._connection = new EventSource(this.uri);
+
+    this.setCallbacks();
+  },
+
+  close: function() {
+    delete this._connection;
+  },
+
+  setCallbacks: function() {
     var self = this,
-        conn = new EventSource(this.uri);
+        conn = this._connection;
 
     conn.onerror = function(e) {
       self.onError.call(self, e);
@@ -62,6 +73,9 @@ $.extend(Communicator.prototype, Backbone.Events, {
   },
 
   onMessage: function(e) {
+    if (e.origin != this.uri) {
+      throw new Error("Invalid message origin");
+    }
     this.eventBus.trigger(this.namespace + ":message", this.parse(e.data));
   },
 
