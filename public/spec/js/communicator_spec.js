@@ -69,7 +69,7 @@ describe('Redch.Communicator', function() {
       eventBusMock.on('communicator:open', onOpenHandler);
       eventBusMock.on('communicator:message', onMessageHandler);
       connectStub = sinon.stub(comm, 'connect', function() {
-        comm.onOpen();
+        comm.onOpen({});
         comm.onMessage({ data: JSON.stringify(data) });
       });
       comm.connect();
@@ -93,7 +93,7 @@ describe('Redch.Communicator', function() {
         message = msg;
       });
       comm.connect();
-      expect(data).toBeTruthy();
+      expect(message).toBeTruthy();
     });
   });
 
