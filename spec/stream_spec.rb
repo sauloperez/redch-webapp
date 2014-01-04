@@ -17,21 +17,21 @@ describe "/stream" do
   it 'should create a channel' do
     em.run do
       expect(AMQP::Channel).to receive(:new)
-      Redch.subscribe_to exchange_name, stream
+      Redch.subscribe_to exchange_name, @stream
     end
   end
 
   it 'should create a fanout exchange' do
     em.run do
       expect(channel).to receive(:fanout)
-      Redch.subscribe_to exchange_name, stream
+      Redch.subscribe_to exchange_name, @stream
     end
   end
 
   it 'should subscribe to the queue' do
     em.run do
       expect(queue).to receive(:subscribe)
-      Redch.subscribe_to exchange_name, stream
+      Redch.subscribe_to exchange_name, @stream
     end
   end
 end
