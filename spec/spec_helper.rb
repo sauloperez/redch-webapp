@@ -15,10 +15,10 @@ RSpec.configure do |c|
   c.include RSpecMixin
 end
 
-def mock_EM(em = nil)
-  em = double EM if em.nil?
-  em.stub(:add_periodic_timer)
-  em.stub(:run)
+def mock_EM
+  @event_machine = double EM
+  @event_machine.stub(:add_periodic_timer)
+  @event_machine.stub(:run)
 end
 
 def mock_amqp
@@ -40,8 +40,7 @@ def mock_amqp
 end
 
 def mock_stream
-  stream = double
-  stream.stub(:callback)
-  stream.stub(:<<)
-  stream
+  @stream = double
+  @stream.stub(:callback)
+  @stream.stub(:<<)
 end
