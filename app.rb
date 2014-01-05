@@ -5,7 +5,7 @@ require 'json'
 module Redch
 
   class StreamingSubscription
-    attr_reader :stream, :timer, :channel
+    attr_reader :stream, :timer, :channel, :exchange, :queue
 
     INTERVAL = 20 # in seconds
 
@@ -14,9 +14,9 @@ module Redch
     end
 
     def to(exchange_name)
-      @channel = AMQP::Channel.new(AMQP.connection)
-      queue    = channel.queue('', exclusive: true)
-      exchange = channel.fanout(exchange_name)
+      @channel  = AMQP::Channel.new(AMQP.connection)
+      @queue    = channel.queue('', exclusive: true)
+      @exchange = channel.fanout(exchange_name)
 
       queue.bind(exchange).subscribe do |payload|
         p "#{payload} forwarded to clients"

@@ -36,4 +36,16 @@ describe "/stream" do
       Redch.subscribe_to exchange_name, @stream
     end
   end
+
+  context 'when subscribed' do
+    let(:subscription) { Redch::StreamingSubscription.new(@stream) }
+
+    it 'forwards each message to the clients' do
+      @event_machine.run do
+        subscription.to 'samples'
+        subscription.exchange.publish "Hello, world!", routing_key: ''
+        expect(@stream).to receive(:<<).with("data: Hello, world!\n\n")
+      end
+    end
+  end
 end
