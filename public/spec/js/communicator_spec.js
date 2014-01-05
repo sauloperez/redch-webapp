@@ -62,7 +62,7 @@ describe('Redch.Communicator', function() {
     expect(c.uri).toBe("http://www.redch.org:8888");
   });
 
-  describe("when already connect", function() {
+  describe("when already connected", function() {
     var c;
 
     beforeEach(function() {
@@ -146,7 +146,7 @@ describe('Redch.Communicator', function() {
     it("throws an Error if message comes from invalid origin", function() {
       expect(function() {
         invalidOriginComm.connect();
-      }).toThrow(new Error("Invalid message origin"));
+      }).toThrow();
     });
   });
 
