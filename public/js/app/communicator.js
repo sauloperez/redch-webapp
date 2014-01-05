@@ -29,7 +29,7 @@ var Communicator = function(options) {
   this.eventBus = options.eventBus;
 
   // Make the config accessible
-  this.config = _.extend({}, options);
+  this.config = options;
 
   this.initialize.apply(this, arguments);
 };
@@ -54,8 +54,8 @@ $.extend(Communicator.prototype, Backbone.Events, {
   },
 
   setCallbacks: function() {
-    var self = this,
-        conn = this._connection;
+    var conn = this._connection,
+        self = this;
 
     conn.onerror = function(e) {
       self.onError.call(self, e);
@@ -74,7 +74,7 @@ $.extend(Communicator.prototype, Backbone.Events, {
 
   onMessage: function(e) {
     if (e.origin != this.uri) {
-      throw new Error("Invalid message origin");
+      throw new Error("Invalid message origin '" + e.origin + "'");
     }
     this.eventBus.trigger(this.namespace + ":message", this.parse(e.data));
   },
