@@ -53,5 +53,15 @@ describe "/stream" do
         expect(stream).to receive(:<<).with("data: Hello, world!\n\n")
       end
     end
+
+    it 'sends JSON-encoded messages' do
+      @event_machine.run do
+        subscription.to 'samples'
+        subscription.exchange.publish "{key: 'string value'}", routing_key: ''
+        expect(@stream).to receive(:<<) do |msg|
+          expect(valid_json?(msg)).to be true
+        end
+      end
+    end
   end
 end

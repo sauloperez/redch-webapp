@@ -5,6 +5,7 @@ require 'bundler/setup'
 Bundler.require :default, :test
 
 require_relative '../app'
+require 'json'
 
 module RSpecMixin
   include Rack::Test::Methods
@@ -45,4 +46,11 @@ def mock_stream
   allow(stream).to receive(:callback)
   allow(stream).to receive(:<<)
   stream
+end
+
+def valid_json?(json)
+  JSON.parse(json)
+  return true
+rescue JSON::ParserError
+  return false
 end
