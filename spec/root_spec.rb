@@ -10,7 +10,7 @@ describe Redch::App do
 
     it { should be_ok }
 
-    it "should show a map" do
+    it "shows a map" do
       expect(subject.body).to match /id="map"/
     end
   end
