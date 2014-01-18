@@ -143,6 +143,16 @@ describe('Redch.Communicator', function() {
       expect(message).toBeTruthy();
     });
 
+    it("triggers an Error event on error", function() {
+      var errorHandler = function() { expect(true).toBe(true) },
+          c = new Communicator({
+            eventBus: eventBusMock,
+            uri: 'invalidUri'
+          });
+      eventBusMock.on('communicator:error', errorHandler);
+      c.connect();
+    });
+
     it("throws an Error if message comes from invalid origin", function() {
       expect(function() {
         invalidOriginComm.connect();
