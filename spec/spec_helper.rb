@@ -15,10 +15,11 @@ RSpec.configure do |c|
   c.include RSpecMixin
 end
 
-def mock_EM(em = nil)
-  em = double EM if em.nil?
+def mock_EventMachine
+  em = double EM
   em.stub(:add_periodic_timer)
   em.stub(:run)
+  em
 end
 
 def mock_amqp

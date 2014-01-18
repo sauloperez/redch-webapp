@@ -2,13 +2,10 @@ require_relative "./spec_helper"
 
 describe "/stream" do
   let(:exchange_name) { "samples" }
-  let(:em) { double EM }
+  let(:em) { mock_EventMachine }
+  let(:stream) { mock_stream }
 
-  before :each do
-    mock_EM(em)
-    mock_amqp
-    stream = mock_stream
-  end
+  before { mock_amqp }
 
   it 'should open a streaming connection' do
     em.run do
