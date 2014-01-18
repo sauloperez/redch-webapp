@@ -2,12 +2,10 @@ require_relative "./spec_helper"
 
 describe "/stream" do
   let(:exchange_name) { "samples" }
+  let(:em) { mock_EventMachine }
+  let(:stream) { mock_stream }
 
-  before do
-    mock_EM
-    mock_amqp
-    mock_stream
-  end
+  before { mock_amqp }
 
   it 'should open a streaming connection' do
     @event_machine.run do
@@ -38,13 +36,13 @@ describe "/stream" do
   end
 
   context 'when subscribed' do
-    let(:subscription) { Redch::StreamingSubscription.new(@stream) }
+    let(:subscription) { Redch::StreamingSubscription.new(stream) }
 
     it 'forwards each message to the clients' do
-      @event_machine.run do
+      em.run do
         subscription.to 'samples'
         subscription.exchange.publish "Hello, world!", routing_key: ''
-        expect(@stream).to receive(:<<).with("data: Hello, world!\n\n")
+        expect(stream).to receive(:<<).with("data: Hello, world!\n\n")
       end
     end
   end

@@ -15,32 +15,34 @@ RSpec.configure do |c|
   c.include RSpecMixin
 end
 
-def mock_EM
-  @event_machine = double EM
-  @event_machine.stub(:add_periodic_timer)
-  @event_machine.stub(:run)
+def mock_EventMachine
+  em = double EM
+  allow(em).to receive(:add_periodic_timer)
+  allow(em).to receive(:run)
+  em
 end
 
 def mock_amqp
   exchange = double AMQP::Exchange
-  queue = double AMQP::Queue
-  channel = double AMQP::Channel
+  queue    = double AMQP::Queue
+  channel  = double AMQP::Channel
 
-  channel.stub(:queue) { queue }
-  channel.stub(:fanout) { exchange }
-  channel.stub(:close)
+  allow(channel).to receive(:queue) { queue }
+  allow(channel).to receive(:fanout) { exchange }
+  allow(channel).to receive(:close)
 
-  exchange.stub(:name) { "" }
+  allow(exchange).to receive(:name) { "" }
 
-  queue.stub(:bind).with(exchange) { queue }
-  queue.stub(:name) { "" }
-  queue.stub(:subscribe)
+  allow(queue).to receive(:bind).with(exchange) { queue }
+  allow(queue).to receive(:name) { "" }
+  allow(queue).to receive(:subscribe)
 
   AMQP::Channel.stub(:new) { channel }
 end
 
 def mock_stream
-  @stream = double
-  @stream.stub(:callback)
-  @stream.stub(:<<)
+  stream = double
+  allow(stream).to receive(:callback)
+  allow(stream).to receive(:<<)
+  stream
 end

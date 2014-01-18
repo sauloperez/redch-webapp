@@ -1,14 +1,27 @@
-$(function() {
+(function() {
   'use strict';
 
+  // Initial Setup
+  // -------------
+
+  // Namespace
   var Redch = window.Redch = {
     Collections: {},
     Models: {}
   };
 
+  // Models and Collections
   Redch.Models.Observation = Backbone.Model.extend({});
   Redch.Collections.Observations = Backbone.Collection.extend({
-    model: Redch.Models.Observation
+    model: Redch.Models.Observation,
+
+    createFromMessage: function(msg) {
+      this.create(new Redch.Models.Observation(msg));
+    },
+
+    removeFromMessage: function(msg) {
+      this.remove(new Redch.Models.Observation(msg));
+    }
   });
 
   // Let the global Redch object serve as a global event bus
@@ -30,27 +43,27 @@ $(function() {
   });
 
   // Server communication
-  Redch.communicator = new Communicator({ 
+  Redch.communicator = new Communicator({
     eventBus: Redch,
-    uri: '/stream' 
+    uri: '/stream'
   });
   Redch.communicator.connect();
 
-  // Store each observation received
+  // Visualize each observation received
   Redch.on("communicator:message", function(msg) {
+
+    // TODO send the proper action from the SOS
     msg.action = "add";
     msg.LatLng = new L.LatLng(msg.coord[0], msg.coord[1]);
 
-    var observation = new Redch.Models.Observation(msg);
-    
     switch(observation.get('action')) {
       case "add":
-        Redch.observations.add(observation);
+        Redch.observations.createFromMessage(msg);
         break;
       case "delete":
-        Redch.observations.remove(observation);
+        Redch.observations.removeFromMessage(observation);
         break;
     }
-    
+
   });
-});
+})();
