@@ -8,30 +8,30 @@ describe "/stream" do
   before { mock_amqp }
 
   it 'should open a event-stream streaming connection' do
-    @event_machine.run do
+    em.run do
       get '/stream', provides: 'text/event-stream'
       expect(last_response.content_type).to eq 'text/event-stream;charset=utf-8'
     end
   end
 
   it 'should create a channel' do
-    @event_machine.run do
+    em.run do
       expect(AMQP::Channel).to receive(:new)
-      Redch.subscribe_to exchange_name, @stream
+      Redch.subscribe_to exchange_name, stream
     end
   end
 
   it 'should create a fanout exchange' do
-    @event_machine.run do
+    em.run do
       expect(channel).to receive(:fanout)
-      Redch.subscribe_to exchange_name, @stream
+      Redch.subscribe_to exchange_name, stream
     end
   end
 
   it 'should subscribe to the queue' do
-    @event_machine.run do
+    em.run do
       expect(queue).to receive(:subscribe)
-      Redch.subscribe_to exchange_name, @stream
+      Redch.subscribe_to exchange_name, stream
     end
   end
 
@@ -42,12 +42,12 @@ describe "/stream" do
       em.run do
         subscription.to 'samples'
         subscription.exchange.publish "some observation", routing_key: ''
-        expect(@stream).to receive(:<<).with(/some observation/)
+        expect(stream).to receive(:<<).with(/some observation/)
       end
     end
 
     it 'messages conform to the Event Stream Format' do
-      @event_machine.run do
+      em.run do
         subscription.to 'samples'
         subscription.exchange.publish "Hello, world!", routing_key: ''
         expect(stream).to receive(:<<).with("data: Hello, world!\n\n")
@@ -55,10 +55,10 @@ describe "/stream" do
     end
 
     it 'sends JSON-encoded messages' do
-      @event_machine.run do
+      em.run do
         subscription.to 'samples'
         subscription.exchange.publish "{key: 'string value'}", routing_key: ''
-        expect(@stream).to receive(:<<) do |msg|
+        expect(stream).to receive(:<<) do |msg|
           expect(valid_json?(msg)).to be true
         end
       end
