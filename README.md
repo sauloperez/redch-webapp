@@ -44,7 +44,7 @@ To test the frontend start up the server as stated above and point your browser 
 
 As for the backend, type the following in your terminal:
 
-	$ rspec spec
+	rspec spec
 
 This will execute all tests contained in the spec folder. 
 
