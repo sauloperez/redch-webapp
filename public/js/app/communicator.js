@@ -73,7 +73,7 @@ $.extend(Communicator.prototype, Backbone.Events, {
   },
 
   onMessage: function(e) {
-    if (e.origin != this.uri) {
+    if (!this.isSameOrigin(e.origin, this.uri)) {
       throw new Error("Invalid message origin '" + e.origin + "'");
     }
     this.eventBus.trigger(this.namespace + ":message", this.parse(e.data));
@@ -81,5 +81,15 @@ $.extend(Communicator.prototype, Backbone.Events, {
 
   onOpen: function(e) {
     this.eventBus.trigger(this.namespace + ":open", e);
+  },
+
+  isSameOrigin: function(uri_a, uri_b) {
+    a = URIUtils.parseURI(uri_a);
+    b = URIUtils.parseURI(uri_b);
+
+    return (a.href == b.href) ||
+           (a.protocol == b.protocol && a.host == b.host && a.host != '') ||
+           (URIUtils.isRelativeURI(uri_a) && b.hostname == 'localhost') ||
+           (URIUtils.isRelativeURI(uri_b) && a.hostname == 'localhost');
   }
 });
