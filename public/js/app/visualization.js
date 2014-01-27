@@ -56,8 +56,12 @@ $.extend(Visualization.prototype, Backbone.Events, {
   resetOverlay: function(g) {
     var self = this;
     g.selectAll("circle")
-      .attr("cx", function(d) { return self.project(d.LatLng).x; })
-      .attr("cy", function(d) { return self.project(d.LatLng).y; });
+      .attr("cx", function(d) {
+        return self.project(d.get('LatLng')).x;
+      })
+      .attr("cy", function(d) {
+        return self.project(d.get('LatLng')).y;
+      });
   },
 
   draw: function() {
@@ -77,11 +81,11 @@ $.extend(Visualization.prototype, Backbone.Events, {
         return returnColor;
       })
       .style("fill-opacity", 0.5)
-      .attr("cx", function(d) { 
-        return self.project(d.get('LatLng')).x; 
+      .attr("cx", function(d) {
+        return self.project(d.get('LatLng')).x;
       })
-      .attr("cy", function(d) { 
-        return self.project(d.get('LatLng')).y; 
+      .attr("cy", function(d) {
+        return self.project(d.get('LatLng')).y;
       })
       .attr("r",0).transition().duration(100).attr("r",function(d) {
         return self.map.getZoom() * 2 * d.get('value');
