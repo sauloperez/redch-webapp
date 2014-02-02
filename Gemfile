@@ -4,6 +4,7 @@ gem "thin", "~> 1.6.1"
 gem "sinatra", "~> 1.4.4"
 gem "amqp", "~> 1.1.7"
 gem "json", "~> 1.8.1"
+gem "foreman", "~> 0.63.0"
 
 group :development do
   gem "sinatra-reloader", "~> 1.0"
