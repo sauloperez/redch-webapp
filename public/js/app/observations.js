@@ -12,7 +12,7 @@ Redch.Collections.Observations = Backbone.Collection.extend({
 
   initialize: function() {
     // Remove server-side sync
-    Backbone.sync = function() { return true };
+    Backbone.sync = function() { return true; };
   },
 
   process: function(msg) {
@@ -34,7 +34,11 @@ Redch.Collections.Observations = Backbone.Collection.extend({
 
   removeFromMessage: function(msg) {
     delete msg.action;
-    var obs = this.findWhere(msg);
+    var obs = this.find(function(model) {
+      return model.get('coord')[0] == msg.coord[0] &&
+             model.get('coord')[1] == msg.coord[1] &&
+             model.get('value') == msg.value;
+    });
     this.remove(obs);
   }
 });
