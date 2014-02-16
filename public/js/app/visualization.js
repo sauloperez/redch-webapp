@@ -88,7 +88,7 @@ $.extend(Visualization.prototype, Backbone.Events, {
         return self.project(d.get('LatLng')).y;
       })
       .attr("r",0).transition().duration(100).attr("r",function(d) {
-        return self.map.getZoom() * 2 * d.get('value');
+        return (self.map.getZoom() / 20) * d.get('value');
       });
 
     feature.exit()
