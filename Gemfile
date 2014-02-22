@@ -8,6 +8,8 @@ gem "foreman", "~> 0.63.0"
 
 group :development do
   gem "sinatra-reloader", "~> 1.0"
+  gem "capistrano", "~> 3.1.0"
+  gem 'capistrano-bundler', '~> 1.1.2'
 end
 
 group :test do
