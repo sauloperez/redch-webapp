@@ -61,30 +61,30 @@ namespace :foreman do
   desc "Export the Procfile to Ubuntu's upstart scripts"
   task :export do
     on roles(:app), in: :sequence, wait: 5 do
-      run "cd #{current_path}"
-      # TODO try to get application and user values from variables if possible
-      sudo "bundle exec foreman export upstart /etc/init -a redch -u vagrant"
+      within "#{current_path}" do
+        sudo "bundle exec foreman export upstart /etc/init -a #{fetch(:applicatioin)} -u #{fetch(:user)} -l #{fetch(:shared_path)}/log"
+      end
     end
   end
 
   desc "Start the application services"
   task :start do
     on roles :app do
-      sudo "start #{application}"
+      sudo "start #{fetch(:application)}"
     end
   end
 
   desc "Stop the application services"
   task :stop do
     on roles :app do
-      sudo "stop #{application}"
+      sudo "stop #{fetch(:application)}"
     end
   end
 
   desc "Restart the application services"
   task :restart do
     on roles :app do
-       run "sudo start #{application} || sudo restart #{application}"
+       execute "sudo start #{fetch(:application)} || sudo restart #{fetch(:application)}"
     end
   end
 
