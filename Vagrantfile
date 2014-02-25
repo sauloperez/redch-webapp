@@ -13,4 +13,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :forwarded_port, guest: 80, host: 1234
   config.vm.network :private_network, ip: "33.33.13.38"
   config.vm.synced_folder "/Users/Pau/Sites/pfc-sources/redch-puppet-vm", "/etc/puppet"
+
+  # Let vagrant provision the VM using our puppet manifests
+  config.vm.provision "puppet" do |puppet|
+    puppet.manifests_path = "/Users/Pau/Sites/pfc-sources/redch-puppet-vm/manifests"
+    puppet.manifest_file = "webapp.pp"
+    puppet.options = "--verbose"
+  end
 end

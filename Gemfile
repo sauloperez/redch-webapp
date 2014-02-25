@@ -1,12 +1,12 @@
 source "https://rubygems.org"
 
-gem "thin", "~> 1.6.1"
 gem "sinatra", "~> 1.4.4"
 gem "amqp", "~> 1.1.7"
 gem "json", "~> 1.8.1"
 gem "foreman", "~> 0.63.0"
 
 group :development do
+  gem "thin", "~> 1.6.1"
   gem "sinatra-reloader", "~> 1.0"
   gem "capistrano", "~> 3.1.0"
   gem 'capistrano-bundler', '~> 1.1.2'
