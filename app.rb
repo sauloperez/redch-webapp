@@ -18,8 +18,8 @@ module Redch
       @queue    = channel.queue('', exclusive: true)
       @exchange = channel.fanout(exchange_name)
 
+      # Send message to clients through the streaming connection
       queue.bind(exchange).subscribe do |payload|
-        p "#{payload} forwarded to clients"
         stream << "data: #{payload}\n\n"
       end
 
@@ -36,8 +36,6 @@ module Redch
     def clean_up
       timer.cancel
       channel.close
-
-      p "Removed connection:  #{stream.object_id}"
     end
   end
 
@@ -49,9 +47,14 @@ module Redch
   class App < Sinatra::Base
     configure do
       enable :logging
+
       EM.next_tick do
         AMQP.connection = AMQP.connect :host => ENV['AMQP_HOST']
       end
+    end
+
+    before do
+      env['rack.logger'] = Logger.new("#{settings.root}/log/#{settings.environment}.log", 'weekly')
     end
 
     get '/' do
@@ -60,7 +63,7 @@ module Redch
 
     get '/stream', provides: 'text/event-stream' do
       stream :keep_open do |out|
-        p "New connection: #{out.object_id}"
+        logger.info "New connection: #{out.object_id}"
 
         Redch.subscribe_to 'samples', stream: out
       end
