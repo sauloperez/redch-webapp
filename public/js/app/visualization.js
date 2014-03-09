@@ -5,13 +5,17 @@
 
 var Visualization = function(options) {
   if (options && !options.collection) {
-    throw new Error("collection not specified");
+    throw new Error('collection not specified');
+  }
+
+  if (options && !options.mapId) {
+    throw new Error('map id not specified');
   }
 
   var defaults = {
     center: [41.82749, 1.60584],
     zoomLevel: 8
-  }
+  };
 
   options || (options = {});
 
@@ -20,6 +24,7 @@ var Visualization = function(options) {
   this.center = options.center;
   this.zoomLevel = options.zoomLevel;
   this.collection = options.collection;
+  this.mapId = options.mapId;
 
   this.initialize.apply(this);
 };
@@ -40,12 +45,7 @@ $.extend(Visualization.prototype, Backbone.Events, {
   },
 
   setupMap: function() {
-     this.map = L.map('map').setView(this.center, this.zoomLevel);
-
-    L.tileLayer('http://{s}.tile.cloudmade.com/9346c049ef8342d9916bdc1a0d64d73f/998/256/{z}/{x}/{y}.png', {
-      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-      minZoom: this.zoomLevel
-    }).addTo(this.map);
+     this.map = L.mapbox.map('map', this.mapId).setView(this.center, this.zoomLevel);
   },
 
   project: function(p) {

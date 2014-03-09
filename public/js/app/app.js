@@ -7,6 +7,9 @@
   // Let the global Redch object serve as a global event bus
   $.extend(Redch, Backbone.Events);
 
+  // MapBox map id to request for
+  Redch.mapId = 'sauloperez.hec01k4e'
+
   // Set up the observations collections
   Redch.observations = new Redch.Collections.Observations();
 
@@ -20,7 +23,8 @@
 
   // Map Visualization
   Redch.visualization = new Visualization({
-    collection: Redch.observations
+    collection: Redch.observations,
+    mapId: Redch.mapId
   });
 
   // Server communication
