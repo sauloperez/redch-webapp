@@ -8,7 +8,8 @@
   $.extend(Redch, Backbone.Events);
 
   // MapBox map id to request for
-  Redch.mapId = 'sauloperez.hec01k4e'
+  // black example: examples.map-y7l23tes
+  Redch.mapId = 'sauloperez.hec01k4e';
 
   // Set up the observations collections
   Redch.observations = new Redch.Collections.Observations();

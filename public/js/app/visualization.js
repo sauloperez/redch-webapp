@@ -72,12 +72,14 @@ $.extend(Visualization.prototype, Backbone.Events, {
     feature.enter()
       .append("circle")
       .style("fill", function(model) {
-        var d = model.get('value');
-        var returnColor;
+        var d = model.get('value'),
+            returnColor;
+
         if (d >= 0.2) returnColor = "red";
         else if (d >= 0.1) returnColor = "orange";
         else if (d >= 0.05) returnColor = "yellow";
         else returnColor = "green";
+
         return returnColor;
       })
       .style("fill-opacity", 0.5)
