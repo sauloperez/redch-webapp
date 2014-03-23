@@ -49,7 +49,9 @@ var SpecHelper = {
   },
 
   isObservation: function(obs) {
-    return (!!obs.get('action') && (obs.get('action') == 'add' || obs.get('action') == 'delete') &&
+    return (!!obs.get('id') &&
+            !!obs.get('sensorId') &&
+            !!obs.get('action') && (obs.get('action') == 'ADD' || obs.get('action') == 'DELETE') &&
             !!obs.get('coord') && _.isNumber(obs.get('coord')[0]) && _.isNumber(obs.get('coord')[1]) &&
             !!obs.get('value') && _.isNumber(obs.get('value')));
   }

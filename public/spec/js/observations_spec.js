@@ -29,7 +29,7 @@ describe('Redch.Collections.Observations', function() {
   });
 
   describe('removeFromMessage', function() {
-    var obsToDelete;
+    var obsToDelete, obsToKeep;
 
     beforeEach(function() {
       for (var i = 0; i < 2; i++) {
@@ -38,10 +38,11 @@ describe('Redch.Collections.Observations', function() {
         observations.add(msg);
       }
       obsToDelete = observations.at(0);
+      obsToKeep = observations.at(1);
     });
 
     it('removes the observation with sensor id equal to the sensor id of the message', function() {
-      var msg = JSON.parse(SpecHelper.buildMessage()); 
+      var msg = JSON.parse(SpecHelper.buildMessage());
       msg.sensorId = obsToDelete.get('sensorId');
       msg.action = 'DELETE';
 
@@ -49,6 +50,16 @@ describe('Redch.Collections.Observations', function() {
       expect(observations.find(function(model) {
         return model.get('sensorId') == msg.sensorId;
       })).toBeFalsy();
+    });
+
+    it('does not remove the observations with sensor id not equal to the sensor id of the message', function() {
+      var msg = JSON.parse(SpecHelper.buildMessage());
+      msg.sensorId = obsToDelete.get('sensorId');
+
+      observations.removeFromMessage(msg);
+      expect(observations.find(function(model) {
+        return model.get('sensorId') == obsToKeep.get('sensorId');
+      })).toBeTruthy();
     });
   });
 
