@@ -11,16 +11,16 @@ Redch.Collections.Observations = Backbone.Collection.extend({
   url: '',
 
   initialize: function() {
-    // Remove server-side sync
+    // Disable server-side sync
     Backbone.sync = function() { return true; };
   },
 
   process: function(msg) {
     switch (msg.action) {
-      case 'add':
+      case 'ADD':
         return this.createFromMessage(msg);
         break;
-      case 'delete':
+      case 'DELETE':
         return this.removeFromMessage(msg);
         break;
       default:
@@ -29,16 +29,19 @@ Redch.Collections.Observations = Backbone.Collection.extend({
   },
 
   createFromMessage: function(msg) {
-    return this.create(new Redch.Models.Observation(msg));
+    var obs = new Redch.Models.Observation(msg);
+    console.log('Added observation #' + obs.get('id'));
+    return this.create(obs);
   },
 
   removeFromMessage: function(msg) {
-    delete msg.action;
     var obs = this.find(function(model) {
-      return model.get('coord')[0] == msg.coord[0] &&
-             model.get('coord')[1] == msg.coord[1] &&
-             model.get('value') == msg.value;
+      return model.get('sensorId') == msg.sensorId;
     });
-    this.remove(obs);
+ 
+    if (obs) {
+      this.remove(obs);
+      console.log('Removed observation #' + obs.get('id'));
+    }
   }
 });

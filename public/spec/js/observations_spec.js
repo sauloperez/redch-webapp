@@ -20,27 +20,54 @@ describe('Redch.Collections.Observations', function() {
   it("doesn't sync with the server", function() {
     var ajaxSpy = sinon.spy(Backbone, 'ajax');
 
-    msg.action = 'add';
+    msg.action = 'ADD';
     observations.process(msg);
-    msg.action = 'delete';
+    msg.action = 'DELETE';
     observations.process(msg);
 
     expect(ajaxSpy).not.toHaveBeenCalled();
   });
 
+  describe('removeFromMessage', function() {
+    var obsToDelete;
+
+    beforeEach(function() {
+      for (var i = 0; i < 2; i++) {
+        msg = JSON.parse(SpecHelper.buildMessage());
+        msg.action = 'ADD';
+        observations.add(msg);
+      }
+      obsToDelete = observations.at(0);
+    });
+
+    it('removes the observation with sensor id equal to the sensor id of the message', function() {
+      var msg = JSON.parse(SpecHelper.buildMessage()); 
+      msg.sensorId = obsToDelete.get('sensorId');
+      msg.action = 'DELETE';
+
+      observations.removeFromMessage(msg);
+      expect(observations.find(function(model) {
+        return model.get('sensorId') == msg.sensorId;
+      })).toBeFalsy();
+    });
+  });
+
+
   describe('process', function() {
     it('adds the observation to the collection if action is add', function() {
-      msg.action = 'add';
+      msg.action = 'ADD';
       observations.process(msg);
+
       expect(observations.findWhere(msg)).toBeTruthy();
     });
 
-    it('deletes the observation from the collection if actions is delete', function() {
-      msg.action = 'add';
+    it('deletes the observation from the collection if actions is DELETE', function() {
+      msg.action = 'ADD';
       observations.process(msg);
 
-      msg.action = 'delete';
+      msg.action = 'DELETE';
       observations.process(msg);
+
       expect(observations.models.length).toEqual(0);
     });
 
