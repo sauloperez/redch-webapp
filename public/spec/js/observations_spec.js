@@ -6,11 +6,6 @@ describe('Redch.Collections.Observations', function() {
     observations = new Redch.Collections.Observations();
   });
 
-  it('creates an observation from a message', function() {
-    obs = observations.createFromMessage(msg);
-    expect(SpecHelper.isObservation(obs)).toBe(true);
-  });
-
   it('removes an observation from the collection given a message', function() {
     observations.createFromMessage(msg);
     observations.removeFromMessage(msg);
@@ -26,6 +21,19 @@ describe('Redch.Collections.Observations', function() {
     observations.process(msg);
 
     expect(ajaxSpy).not.toHaveBeenCalled();
+  });
+
+  describe('createFromMessage', function() {
+    it('creates and returns the observation created from the message', function() {
+      var obs = observations.createFromMessage(msg);
+      expect(SpecHelper.isObservation(obs)).toBe(true);
+    });
+
+    it('adds the observation to the collection', function() {
+      var oldLength = observations.models.length;
+      observations.createFromMessage(msg);
+      expect(observations.models.length).toEqual(oldLength + 1);
+    });
   });
 
   describe('removeFromMessage', function() {
