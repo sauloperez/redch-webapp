@@ -24,14 +24,26 @@ Redch.Collections.Observations = Backbone.Collection.extend({
         return this.removeFromMessage(msg);
         break;
       default:
-        throw new Error("Invalid message action");
+        throw new Error('Invalid message action');
     }
   },
 
   createFromMessage: function(msg) {
-    var obs = new Redch.Models.Observation(msg);
-    console.log('Added observation #' + obs.get('id'));
-    return this.create(obs);
+    var logMessage = 'Added',
+        obs = new Redch.Models.Observation(msg),
+        oldObs = this.findWhere({ sensorId: obs.get('sensorId') });
+
+    if (oldObs) {
+      _.extend(oldObs.attributes, obs.attributes);
+      logMessage = 'Updated';
+    }
+    else {
+      this.add(obs);
+    }
+
+    console.log(logMessage + ' observation #' + obs.get('id') + ' from sensor #' + obs.get('sensorId'));
+
+    return obs;
   },
 
   removeFromMessage: function(msg) {
@@ -41,7 +53,7 @@ Redch.Collections.Observations = Backbone.Collection.extend({
  
     if (obs) {
       this.remove(obs);
-      console.log('Removed observation #' + obs.get('id'));
+      console.log('Removed observation #' + obs.get('id') + ' from sensor #' + obs.get('sensorId'));
     }
   }
 });

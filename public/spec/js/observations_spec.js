@@ -34,6 +34,18 @@ describe('Redch.Collections.Observations', function() {
       observations.createFromMessage(msg);
       expect(observations.models.length).toEqual(oldLength + 1);
     });
+
+    it('updates the observation if it already exists one with the same sensor id', function() {
+      var obs = observations.createFromMessage(msg);
+          oldLength = observations.models.length,
+
+      msg = JSON.parse(SpecHelper.buildMessage());
+      msg.sensorId = obs.get('sensorId');
+      obsUpdate = observations.createFromMessage(msg);
+
+      expect(observations.models.length).toEqual(oldLength);
+      expect(obsUpdate.get('sensorId')).toEqual(obs.get('sensorId'));
+    });
   });
 
   describe('removeFromMessage', function() {
