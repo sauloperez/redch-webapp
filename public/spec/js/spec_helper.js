@@ -17,7 +17,7 @@ var SpecHelper = {
     };
   },
 
-  buildMessage: function() {
+  buildMessage: function(options) {
     var msg = {
       'id': this.generateId(),
       'action': _.sample(['ADD', 'DELETE']),
@@ -25,6 +25,7 @@ var SpecHelper = {
       'coord': [41.42142441631396,2.20510654694952],
       'value': Math.random()
     };
+    _.extend(msg, options);
 
     return JSON.stringify(msg);
   },
