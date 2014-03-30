@@ -63,9 +63,15 @@ module Redch
 
     get '/stream', provides: 'text/event-stream' do
       stream :keep_open do |out|
-        logger.info "New connection: #{out.object_id}"
+        EM.run do
+          if defined?(PhusionPassenger)
+            AMQP.connection = AMQP.connect :host => ENV['AMQP_HOST']
+          end
 
-        Redch.subscribe_to 'samples', stream: out
+          Redch.subscribe_to 'samples', stream: out
+
+          logger.info "New connection: #{out.object_id}"
+        end
       end
     end
 
