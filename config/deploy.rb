@@ -40,21 +40,21 @@ namespace :deploy do
   desc 'Start redch'
   task :start do
     on roles(:app), in: :sequence, wait: 5 do
-      sudo 'redch start'
+      sudo 'start redch'
     end
   end
 
   desc 'Stop redch'
   task :stop do
     on roles(:app), in: :sequence, wait: 5 do
-      sudo 'redch stop'
+      sudo 'stop redch'
     end
   end
 
   desc 'Restart redch'
   task :restart do
     on roles(:app), in: :sequence, wait: 5 do
-      sudo 'redch restart'
+      sudo 'restart redch'
     end
   end
 
