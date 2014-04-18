@@ -117,8 +117,9 @@ body {
 }
 
 p {
-  line-height: 24px;
+  line-height: 25px;
   font-weight: 300;
+  color: #8a8a8a;
 }
 
 #map svg {
