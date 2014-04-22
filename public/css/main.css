@@ -112,14 +112,21 @@ body {
   font-family: 'Lato', sans-serif;
 }
 
+.title {
+  margin-bottom: 8px;
+}
+
 .author {
   font-weight: normal;
+  color: #8a8a8a;
+  margin-top: 0;
 }
 
 p {
-  line-height: 25px;
+  font-family: 'Noto Serif', serif;
+  line-height: 27px;
   font-weight: 300;
-  color: #8a8a8a;
+  color: #222;
 }
 
 #map svg {
