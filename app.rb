@@ -14,6 +14,8 @@ module Redch
     end
 
     def to(exchange_name)
+      AMQP.connection = AMQP.connect host: ENV.fetch('AMQP_HOST', '127.0.0.1')
+
       @channel  = AMQP::Channel.new(AMQP.connection)
       @queue    = channel.queue('', exclusive: true)
       @exchange = channel.fanout(exchange_name)
@@ -47,10 +49,6 @@ module Redch
   class App < Sinatra::Base
     configure do
       enable :logging
-
-      EM.next_tick do
-        AMQP.connection = AMQP.connect :host => ENV['AMQP_HOST']
-      end
     end
 
     before do
@@ -64,9 +62,6 @@ module Redch
     get '/stream', provides: 'text/event-stream' do
       stream :keep_open do |out|
         EM.run do
-          if defined?(PhusionPassenger)
-            AMQP.connection = AMQP.connect :host => ENV['AMQP_HOST']
-          end
 
           Redch.subscribe_to 'samples', stream: out
 
