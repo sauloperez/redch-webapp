@@ -62,7 +62,6 @@ module Redch
     get '/stream', provides: 'text/event-stream' do
       stream :keep_open do |out|
         EM.run do
-
           Redch.subscribe_to 'samples', stream: out
 
           logger.info "New connection: #{out.object_id}"
