@@ -53,6 +53,7 @@ module Redch
 
     before do
       env['rack.logger'] = Logger.new("#{settings.root}/log/#{settings.environment}.log", 'weekly')
+      logger.progname = 'webapp'
     end
 
     get '/' do
