@@ -8,7 +8,7 @@ set :ssh_options, {
   forward_agent: true
 }
 
-ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }
+ask :branch, 'develop'
 
 # Default deploy_to directory is /var/www/my_app
 set :deploy_to, '/var/redch'
@@ -36,27 +36,3 @@ set :copy_strategy, :export
 # Required when not using rvm or rbenv
 SSHKit.config.command_map[:rake]  = "bundle exec rake"
 
-namespace :deploy do
-  desc 'Start redch'
-  task :start do
-    on roles(:app), in: :sequence, wait: 5 do
-      sudo 'start redch'
-    end
-  end
-
-  desc 'Stop redch'
-  task :stop do
-    on roles(:app), in: :sequence, wait: 5 do
-      sudo 'stop redch'
-    end
-  end
-
-  desc 'Restart redch'
-  task :restart do
-    on roles(:app), in: :sequence, wait: 5 do
-      sudo 'restart redch'
-    end
-  end
-
-  after :publishing, :restart
-end
