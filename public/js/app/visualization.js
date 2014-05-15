@@ -67,22 +67,17 @@ $.extend(Visualization.prototype, Backbone.Events, {
   draw: function() {
     var self = this,
         feature = this._g.selectAll("circle")
-          .data(this.collection.models);
+          .data(this.collection.models),
+        color = d3.scale.linear()
+          .domain([0, 10])
+          .range(['yellow', 'red']);
 
     feature.enter()
       .append("circle")
       .style("fill", function(model) {
-        var d = model.get('value'),
-            returnColor;
-
-        if (d >= 0.2) returnColor = "red";
-        else if (d >= 0.1) returnColor = "orange";
-        else if (d >= 0.05) returnColor = "yellow";
-        else returnColor = "green";
-
-        return returnColor;
+        return color(model.get('value'));
       })
-      .style("fill-opacity", 0.5)
+      .style("fill-opacity", 0.75)
       .attr("cx", function(d) {
         return self.project(d.get('LatLng')).x;
       })
@@ -90,7 +85,7 @@ $.extend(Visualization.prototype, Backbone.Events, {
         return self.project(d.get('LatLng')).y;
       })
       .attr("r",0).transition().duration(100).attr("r",function(d) {
-        return (self.map.getZoom() / 20) * d.get('value');
+        return (self.map.getZoom() / 1.25);
       });
 
     feature.exit()
