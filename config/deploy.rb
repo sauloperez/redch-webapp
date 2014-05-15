@@ -37,10 +37,24 @@ set :copy_strategy, :export
 SSHKit.config.command_map[:rake]  = "bundle exec rake"
 
 namespace :deploy do
-  desc 'Restart application'
+  desc 'Start redch'
+  task :start do
+    on roles(:app), in: :sequence, wait: 5 do
+      sudo 'start redch'
+    end
+  end
+
+  desc 'Stop redch'
+  task :stop do
+    on roles(:app), in: :sequence, wait: 5 do
+      sudo 'stop redch'
+    end
+  end
+
+  desc 'Restart redch'
   task :restart do
     on roles(:app), in: :sequence, wait: 5 do
-      sudo '/etc/init.d/nginx restart'
+      sudo 'restart redch'
     end
   end
 

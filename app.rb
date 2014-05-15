@@ -14,6 +14,8 @@ module Redch
     end
 
     def to(exchange_name)
+      AMQP.connection = AMQP.connect host: ENV.fetch('AMQP_HOST', '127.0.0.1')
+
       @channel  = AMQP::Channel.new(AMQP.connection)
       @queue    = channel.queue('', exclusive: true)
       @exchange = channel.fanout(exchange_name)
@@ -47,14 +49,11 @@ module Redch
   class App < Sinatra::Base
     configure do
       enable :logging
-
-      EM.next_tick do
-        AMQP.connection = AMQP.connect :host => ENV['AMQP_HOST']
-      end
     end
 
     before do
       env['rack.logger'] = Logger.new("#{settings.root}/log/#{settings.environment}.log", 'weekly')
+      logger.progname = 'webapp'
     end
 
     get '/' do
@@ -63,9 +62,11 @@ module Redch
 
     get '/stream', provides: 'text/event-stream' do
       stream :keep_open do |out|
-        logger.info "New connection: #{out.object_id}"
+        EM.run do
+          Redch.subscribe_to 'samples', stream: out
 
-        Redch.subscribe_to 'samples', stream: out
+          logger.info "New connection: #{out.object_id}"
+        end
       end
     end
 
