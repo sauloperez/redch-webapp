@@ -9,6 +9,11 @@
 /* ==========================================================================
    Base styles: opinionated defaults
    ========================================================================== */
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
 
 html,
 button,
@@ -103,6 +108,20 @@ html, body, #map {
     height: 100%;
 }
 
+body {
+  font-family: 'Lato', sans-serif;
+}
+
+.author {
+  font-weight: normal;
+}
+
+p {
+  line-height: 25px;
+  font-weight: 300;
+  color: #8a8a8a;
+}
+
 #map svg {
     position: relative;
     height: 100%,
@@ -115,6 +134,10 @@ html, body, #map {
     height: 100%;
 }
 
+.sidebar {
+  float: right;
+  padding: 2em 3em 0;
+}
 
 /* ==========================================================================
    Helper classes
