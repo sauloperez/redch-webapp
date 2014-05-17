@@ -6,6 +6,9 @@ GEM
       amq-protocol (>= 1.9.0)
       eventmachine
     backports (3.3.5)
+    byebug (2.6.0)
+      columnize (~> 0.3)
+      debugger-linecache (~> 1.2)
     capistrano (3.1.0)
       i18n
       rake (>= 10.0.0)
@@ -13,7 +16,9 @@ GEM
     capistrano-bundler (1.1.2)
       capistrano (~> 3.0)
       sshkit (~> 1.2)
+    columnize (0.3.6)
     daemons (1.1.9)
+    debugger-linecache (1.2.0)
     diff-lcs (1.2.5)
     dotenv (0.9.0)
     eventmachine (1.0.3)
@@ -72,6 +77,7 @@ PLATFORMS
 
 DEPENDENCIES
   amqp (~> 1.1.7)
+  byebug
   capistrano (~> 3.1.0)
   capistrano-bundler (~> 1.1.2)
   foreman (~> 0.63.0)

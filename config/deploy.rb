@@ -36,3 +36,5 @@ set :copy_strategy, :export
 # Required when not using rvm or rbenv
 SSHKit.config.command_map[:rake]  = "bundle exec rake"
 
+after 'deploy:publishing', 'nginx:restart'
+after 'deploy:publishing', 'passenger:restart'
