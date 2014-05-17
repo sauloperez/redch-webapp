@@ -13,7 +13,7 @@ var Visualization = function(options) {
   }
 
   var defaults = {
-    center: [41.82749, 1.60584],
+    center: [41.82749, 1.60584], // Geoprahic center of Catalonia
     zoomLevel: 8
   };
 
