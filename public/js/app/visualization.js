@@ -48,8 +48,9 @@ $.extend(Visualization.prototype, Backbone.Events, {
      this.map = L.mapbox.map('map', this.mapId).setView(this.center, this.zoomLevel);
   },
 
-  project: function(p) {
-    return this.map.latLngToLayerPoint(p);
+  projectPoint: function(x, y) {
+    var point = this.map.latLngToLayerPoint(new L.LatLng(y, x));
+    this.stream.point(point.x, point.y);
   },
 
   // Relocate the overlaying SVG shapes
@@ -66,11 +67,15 @@ $.extend(Visualization.prototype, Backbone.Events, {
 
   draw: function() {
     var self = this,
-        feature = this._g.selectAll("circle")
-          .data(this.collection.models),
-        color = d3.scale.linear()
-          .domain([0, 10])
-          .range(['yellow', 'red']);
+        feature = this._g
+                        .selectAll("circle")
+                        .data(this.collection.models),
+        color = d3.scale
+                    .linear()
+                    .domain([0, 10])
+                    .range(['yellow', 'red']);
+
+    var projection = d3.geo.transform({ point: this.projectPoint });
 
     // Update circles that are still present
     feature.transition().duration(200).style("fill", function(model) {
@@ -85,14 +90,18 @@ $.extend(Visualization.prototype, Backbone.Events, {
       })
       .style("fill-opacity", 0.75)
       .attr("cx", function(d) {
-        return self.project(d.get('LatLng')).x;
+        // return self.project(d.get('LatLng')).x;
+        var point = d.get('LatLng');
+        return projection(point.lat.toString(), point.lng.toString())[0];
       })
       .attr("cy", function(d) {
-        return self.project(d.get('LatLng')).y;
+        // return self.project(d.get('LatLng')).y;
+        var point = d.get('LatLng');
+        return projection(point.lat.toString(), point.lng.toString())[1];
       })
-      .attr("r",0).transition().duration(100).attr("r",function(d) {
-        return (self.map.getZoom() / 1.25);
-      });
+     .attr("r",0).transition().duration(100).attr("r",function(d) {
+       return (self.map.getZoom() / 1.25);
+     });
 
     // Remove old circles
     feature.exit()
