@@ -21,6 +21,7 @@
 
   Redch.observations.on("add", onUpdate);
   Redch.observations.on("remove", onUpdate);
+  Redch.observations.on("change", onUpdate);
 
   // Map Visualization
   Redch.visualization = new Visualization({

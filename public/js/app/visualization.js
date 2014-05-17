@@ -72,6 +72,12 @@ $.extend(Visualization.prototype, Backbone.Events, {
           .domain([0, 10])
           .range(['yellow', 'red']);
 
+    // Update circles that are still present
+    feature.transition().duration(200).style("fill", function(model) {
+      return color(model.get('value'));
+    });
+
+    // Create new circles
     feature.enter()
       .append("circle")
       .style("fill", function(model) {
@@ -88,6 +94,7 @@ $.extend(Visualization.prototype, Backbone.Events, {
         return (self.map.getZoom() / 1.25);
       });
 
+    // Remove old circles
     feature.exit()
       .transition().duration(250).attr("r",0).remove();
   }

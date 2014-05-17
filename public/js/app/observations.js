@@ -4,7 +4,7 @@ var Redch = window.Redch = {
   Models: {}
 };
 
-Redch.Models.Observation = Backbone.Model.extend({});
+Redch.Models.Observation = Backbone.Model.extend();
 
 Redch.Collections.Observations = Backbone.Collection.extend({
   model: Redch.Models.Observation,
@@ -34,14 +34,16 @@ Redch.Collections.Observations = Backbone.Collection.extend({
         oldObs = this.findWhere({ sensorId: obs.get('sensorId') });
 
     if (oldObs) {
-      _.extend(oldObs.attributes, obs.attributes);
+      oldObs.set(obs.attributes);
+      this.set(oldObs, { remove: false });
+
       logMessage = 'Updated';
     }
     else {
       this.add(obs);
     }
 
-    console.log(logMessage + ' observation #' + obs.get('id') + ' from sensor #' + obs.get('sensorId'));
+    console.log(logMessage + ' observation #' + obs.get('id') + ' from sensor #' + obs.get('sensorId') + ' with value ' + obs.get('value') + 'W');
 
     return obs;
   },
