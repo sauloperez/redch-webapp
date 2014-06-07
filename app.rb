@@ -14,7 +14,12 @@ module Redch
     end
 
     def to(exchange_name)
-      AMQP.connection = AMQP.connect host: ENV.fetch('AMQP_HOST', '127.0.0.1')
+      AMQP.connection = AMQP.connect(host: ENV.fetch('AMQP_HOST', '127.0.0.1'))
+
+      AMQP.connection.on_tcp_connection_loss do |conn, settings|
+        puts '[Network failure] Trying to reconnect...'
+        conn.reconnect(false, 2)
+      end
 
       @channel  = AMQP::Channel.new(AMQP.connection)
       @queue    = channel.queue('', exclusive: true)
