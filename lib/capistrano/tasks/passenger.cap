@@ -3,14 +3,14 @@ namespace :passenger do
   desc "Start passenger"
   task :start do
     on roles(:app), in: :sequence, wait: 5 do
-      sudo "AMQP_HOST=54.72.167.118 bash -c 'cd /var/redch/current; /usr/local/lib/ruby/gems/2.0.0/gems/passenger-4.0.37/bin/passenger start -d -e production -a 127.0.0.1 -p 3000 --log-file /var/redch/shared/log/passenger.log --pid-file /var/redch/shared/pids/passenger.pid'"
+      sudo "AMQP_HOST=54.72.167.118 bash -c 'cd #{fetch(:deploy_to)}/current/; /usr/local/lib/ruby/gems/2.0.0/gems/passenger-4.0.37/bin/passenger start -d -e production -a 127.0.0.1 -p 3000 --log-file #{fetch(:deploy_to)}/shared/log/passenger.log --pid-file #{fetch(:deploy_to)}/shared/pids/passenger.pid'"
     end
   end
 
   desc "Stop passenger"
   task :stop do
     on roles(:app), in: :sequence, wait: 5 do
-      sudo "passenger stop --pid-file /var/redch/shared/pids/passenger.pid"
+      sudo "passenger stop --pid-file #{fetch(:deploy_to)}/shared/pids/passenger.pid"
     end
   end
 

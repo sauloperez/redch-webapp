@@ -8,21 +8,14 @@ set :ssh_options, {
   forward_agent: true
 }
 
-ask :branch, 'develop'
+ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }
 
-# Default deploy_to directory is /var/www/my_app
-set :deploy_to, '/var/redch'
+set :deploy_to, '/var/www/redch'
 
 set :use_sudo, false
 
 set :deploy_via, :copy
 set :copy_strategy, :export
-
-# Default value for :log_level is :debug
-# set :log_level, :debug
-
-# Default value for :pty is false
-# set :pty, true
 
 # Default value for :linked_files is []
 # set :linked_files, %w{config/database.yml}

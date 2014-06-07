@@ -1,5 +1,4 @@
-set :user, 'ubunt'
-set :group, 'ubuntu'
+set :user, 'ubuntu'
 
 set :ssh_options, {
   keys: %w(/Users/pau/.ssh/amazon.cer),
