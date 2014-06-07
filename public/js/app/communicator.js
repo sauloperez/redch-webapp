@@ -50,6 +50,7 @@ $.extend(Communicator.prototype, Backbone.Events, {
   },
 
   close: function() {
+    this._connection.close();
     delete this._connection;
   },
 
