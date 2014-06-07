@@ -6,4 +6,4 @@ set :ssh_options, {
 }
 
 server '54.72.161.42', user: 'ubuntu', roles: %w{app}
-server '54.72.167.118', user: 'ubuntu', roles: %w{amqp}
+#server '54.72.167.118', user: 'ubuntu', roles: %w{amqp}
