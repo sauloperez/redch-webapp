@@ -50,6 +50,6 @@ EOF
 
 RET=$?
 if [ $RET -eq 0 ];then
-  echo "Generated plot from 'data/$NAME.txt' into 'graphs/$NAME.png'"
+  echo "Plot generated from 'data/$NAME.txt' into 'graphs/$NAME.png'"
 fi
 
