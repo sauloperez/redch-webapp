@@ -44,9 +44,12 @@ set ylabel "response time (ms)"
 set datafile separator '\t'
 
 # Plot the data
-plot 'data/$NAME.txt' every ::2 using 2:5 title 'Response time' with points
+plot 'data/$NAME.txt' using 2:5 title 'Response time' with points
 
 EOF
 
-echo "Generated plot from 'data/$NAME.txt' into 'graphs/$NAME.png'"
+RET=$?
+if [ $RET -eq 0 ];then
+  echo "Generated plot from 'data/$NAME.txt' into 'graphs/$NAME.png'"
+fi
 
