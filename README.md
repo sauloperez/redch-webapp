@@ -33,6 +33,8 @@ You can find further documentation in [Process Types and the Procfile](https://d
 
 ## Usage
 
+### Development
+
 Now we are ready to start the webapp. From the root folder type the following in your terminal, using the path of your environment file:
 
     foreman start -e <path_to_env_file>
@@ -40,6 +42,14 @@ Now we are ready to start the webapp. From the root folder type the following in
 Nevertheless, it is recommended to have a development environment file per machine ignored by git, so any customizations can be made for that machine.
 
 That's all. The webapp is up and running. Point your browser to ```http://localhost:3000``` and you will see the real time map.
+
+### Production
+
+In production the deployment process is automatized using [Capistrano](http://capistranorb.com/). To deploy just type the following command from your machine:
+
+	cap production deploy
+
+This essentially runs commands on the remote server through SSH. Once the process is finished, point your browser to the production server.
 
 
 ## Testing
