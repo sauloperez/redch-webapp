@@ -51,6 +51,19 @@ In production the deployment process is automatized using [Capistrano](http://ca
 
 This essentially runs commands on the remote server through SSH. Once the process is finished, point your browser to the production server.
 
+Additionaly, some tasks to manage production services are provided. Each service has its own start, stop and restart actions:
+
+	cap production nginx:restart
+	cap production passenger:stop
+	cap production rabbitmq:start
+	
+	# Or open an SSH connection
+	cap production utils:ssh
+
+To list all available tasks type:
+
+	cap productin -T
+
 
 ## Testing
 
