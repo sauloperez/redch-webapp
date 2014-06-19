@@ -1,0 +1,23 @@
+namespace :nginx do
+
+  desc "Start nginx"
+  task :start do
+    on roles(:app), in: :sequence, wait: 5 do
+      sudo "start nginx"
+    end
+  end
+
+  desc "Stop nginx"
+  task :stop do
+    on roles(:app), in: :sequence, wait: 5 do
+      sudo "stop nginx"
+    end
+  end
+
+  desc "Restart nginx"
+  task :restart do
+    on roles(:app), in: :sequence, wait: 5 do
+      sudo "restart nginx"
+    end
+  end
+end

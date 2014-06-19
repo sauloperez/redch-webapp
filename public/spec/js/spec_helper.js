@@ -17,12 +17,42 @@ var SpecHelper = {
     };
   },
 
-  buildMessage: function() {
-    return '{"action":"'+ _.sample(['add', 'delete']) +'","coord":[41.42142441631396,2.20510654694952],"value":0.57}';
+  buildMessage: function(options) {
+    var msg = {
+      'id': this.generateId(),
+      'action': _.sample(['ADD', 'DELETE']),
+      'sensorId': this.generateSensorId(),
+      'coord': [41.42142441631396,2.20510654694952],
+      'value': Math.random()
+    };
+    _.extend(msg, options);
+
+    return JSON.stringify(msg);
+  },
+
+  generateId: function() {
+    id = Math.random().toString(36).slice(2, 10) + '-'
+       + Math.random().toString(36).slice(2, 6) + '-'
+       + Math.random().toString(36).slice(2, 6) + '-'
+       + Math.random().toString(36).slice(2, 6) + '-'
+       + Math.random().toString(36).slice(2, 14);
+
+    return id;
+  },
+
+  generateSensorId: function() {
+    var mac = '54:52:00';
+    for (var i = 0; i < 6; i++) {
+      if (i%2 === 0) mac += ':';
+      mac += Math.floor(Math.random()*16).toString(16);
+    }
+    return mac;
   },
 
   isObservation: function(obs) {
-    return (!!obs.get('action') && (obs.get('action') == 'add' || obs.get('action') == 'delete') &&
+    return (!!obs.get('id') &&
+            !!obs.get('sensorId') &&
+            !!obs.get('action') && (obs.get('action') == 'ADD' || obs.get('action') == 'DELETE') &&
             !!obs.get('coord') && _.isNumber(obs.get('coord')[0]) && _.isNumber(obs.get('coord')[1]) &&
             !!obs.get('value') && _.isNumber(obs.get('value')));
   }

@@ -1,0 +1,13 @@
+def execute_interactively(command)
+  port = fetch(:port) || 22
+  exec "ssh #{fetch(:user)}@#{host} -p #{port} -t '#{command}'"
+end
+
+namespace :utils do
+  desc "Opens a ssh console into the server"
+  task :ssh do
+    on roles(:app), primary: true do |host|
+      execute_interactively "cd #{current_path}; /bin/bash"
+    end
+  end
+end

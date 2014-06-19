@@ -1,0 +1,24 @@
+namespace :rabbitmq do
+
+  desc "Start rabbitmq"
+  task :start do
+    on roles(:amqp), in: :sequence, wait: 5 do
+      sudo "/etc/init.d/rabbitmq-server start"
+    end
+  end
+
+  desc "Stop rabbitmq"
+  task :stop do
+    on roles(:amqp), in: :sequence, wait: 5 do
+      sudo "/etc/init.d/rabbitmq-server stop"
+    end
+  end
+
+  desc "Restart rabbitmq"
+  task :restart do
+    on roles(:amqp), in: :sequence, wait: 5 do
+      sudo "/etc/init.d/rabbitmq-server restart"
+    end
+  end
+
+end

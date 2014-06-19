@@ -50,6 +50,7 @@ $.extend(Communicator.prototype, Backbone.Events, {
   },
 
   close: function() {
+    this._connection.close();
     delete this._connection;
   },
 
@@ -73,7 +74,7 @@ $.extend(Communicator.prototype, Backbone.Events, {
   },
 
   onMessage: function(e) {
-    if (!this.isSameOrigin(e.origin, this.uri)) {
+    if (!this.isSameOrigin(e.origin, this._connection.url)) {
       throw new Error("Invalid message origin '" + e.origin + "'");
     }
     this.eventBus.trigger(this.namespace + ":message", this.parse(e.data));

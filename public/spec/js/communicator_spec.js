@@ -100,6 +100,7 @@ describe('Redch.Communicator', function() {
     beforeEach(function() {
       eventBusMock.on('communicator:open', onOpenHandler);
       eventBusMock.on('communicator:message', onMessageHandler);
+      comm._connection = { url: '/stream' };
       sinon.stub(comm, 'connect', function() {
         comm.onOpen({ origin: comm.uri });
         comm.onMessage({

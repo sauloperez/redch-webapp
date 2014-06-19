@@ -4,41 +4,58 @@ var Redch = window.Redch = {
   Models: {}
 };
 
-Redch.Models.Observation = Backbone.Model.extend({});
+Redch.Models.Observation = Backbone.Model.extend();
 
 Redch.Collections.Observations = Backbone.Collection.extend({
   model: Redch.Models.Observation,
   url: '',
 
   initialize: function() {
-    // Remove server-side sync
+    // Disable server-side sync
     Backbone.sync = function() { return true; };
   },
 
   process: function(msg) {
     switch (msg.action) {
-      case 'add':
+      case 'ADD':
         return this.createFromMessage(msg);
         break;
-      case 'delete':
+      case 'DELETE':
         return this.removeFromMessage(msg);
         break;
       default:
-        throw new Error("Invalid message action");
+        throw new Error('Invalid message action');
     }
   },
 
   createFromMessage: function(msg) {
-    return this.create(new Redch.Models.Observation(msg));
+    var logMessage = 'Added',
+        obs = new Redch.Models.Observation(msg),
+        oldObs = this.findWhere({ sensorId: obs.get('sensorId') });
+
+    if (oldObs) {
+      oldObs.set(obs.attributes);
+      this.set(oldObs, { remove: false });
+
+      logMessage = 'Updated';
+    }
+    else {
+      this.add(obs);
+    }
+
+    console.log(logMessage + ' observation #' + obs.get('id') + ' from sensor #' + obs.get('sensorId') + ' with value ' + obs.get('value') + 'W');
+
+    return obs;
   },
 
   removeFromMessage: function(msg) {
-    delete msg.action;
     var obs = this.find(function(model) {
-      return model.get('coord')[0] == msg.coord[0] &&
-             model.get('coord')[1] == msg.coord[1] &&
-             model.get('value') == msg.value;
+      return model.get('sensorId') == msg.sensorId;
     });
-    this.remove(obs);
+ 
+    if (obs) {
+      this.remove(obs);
+      console.log('Removed observation #' + obs.get('id') + ' from sensor #' + obs.get('sensorId'));
+    }
   }
 });
